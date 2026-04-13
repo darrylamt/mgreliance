@@ -1,43 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import {
-  LayoutDashboard,
-  Building2,
-  FileText,
-  MessageSquare,
-  LogOut,
-  ExternalLink,
-} from "lucide-react";
+import { LayoutDashboard, Building2, FileText, MessageSquare, LogOut, ExternalLink } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  {
-    href: "/admin/dashboard",
-    label: "Dashboard",
-    icon: LayoutDashboard,
-    exact: true,
-  },
-  {
-    href: "/admin/dashboard/properties",
-    label: "Properties",
-    icon: Building2,
-    exact: false,
-  },
-  {
-    href: "/admin/dashboard/posts",
-    label: "Blog Posts",
-    icon: FileText,
-    exact: false,
-  },
-  {
-    href: "/admin/dashboard/messages",
-    label: "Messages",
-    icon: MessageSquare,
-    exact: false,
-  },
+  { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { href: "/admin/dashboard/properties", label: "Properties", icon: Building2, exact: false },
+  { href: "/admin/dashboard/posts", label: "Blog Posts", icon: FileText, exact: false },
+  { href: "/admin/dashboard/messages", label: "Messages", icon: MessageSquare, exact: false },
 ];
 
 export default function AdminSidebar() {
@@ -54,11 +28,19 @@ export default function AdminSidebar() {
   return (
     <aside className="w-64 bg-primary min-h-screen flex flex-col shrink-0">
       {/* Logo */}
-      <div className="px-6 py-8 border-b border-white/10">
-        <h1 className="font-playfair text-xl font-bold text-white">
-          MG Reliance
-        </h1>
-        <p className="text-white/40 text-xs mt-0.5">Admin Panel</p>
+      <div className="px-5 py-6 border-b border-white/10">
+        <Link href="/admin/dashboard">
+          <div className="bg-white rounded-xl px-3 py-2 inline-block w-full">
+            <Image
+              src="/logo.jpeg"
+              alt="MG Reliance Property Developers"
+              width={160}
+              height={60}
+              className="h-12 w-auto object-contain mx-auto"
+            />
+          </div>
+        </Link>
+        <p className="text-white/40 text-xs mt-2 text-center">Admin Panel</p>
       </div>
 
       {/* Nav */}
@@ -83,9 +65,7 @@ export default function AdminSidebar() {
                 >
                   <Icon size={18} />
                   {item.label}
-                  {isActive && (
-                    <span className="ml-auto w-1.5 h-1.5 bg-accent rounded-full" />
-                  )}
+                  {isActive && <span className="ml-auto w-1.5 h-1.5 bg-accent rounded-full" />}
                 </Link>
               </li>
             );

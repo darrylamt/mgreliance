@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Eye, EyeOff, AlertCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import Button from "@/components/ui/Button";
@@ -38,17 +39,23 @@ export default function AdminLoginPage() {
     <div className="min-h-screen bg-primary flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <h1 className="font-playfair text-3xl font-bold text-white">
-            MG Reliance
-          </h1>
-          <p className="text-white/50 text-sm mt-1">Admin Dashboard</p>
+        <div className="flex justify-center mb-8">
+          <div className="bg-white rounded-2xl px-6 py-4 shadow-lg">
+            <Image
+              src="/logo.jpeg"
+              alt="MG Reliance Property Developers"
+              width={200}
+              height={80}
+              className="h-16 w-auto object-contain"
+              priority
+            />
+          </div>
         </div>
 
         {/* Card */}
         <div className="bg-white rounded-2xl p-8 shadow-2xl">
           <h2 className="font-playfair text-2xl font-bold text-text-main mb-1">
-            Sign In
+            Admin Sign In
           </h2>
           <p className="text-text-secondary text-sm mb-8">
             Access the admin panel to manage your content.
@@ -63,10 +70,7 @@ export default function AdminLoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-text-main mb-2"
-              >
+              <label htmlFor="email" className="block text-sm font-medium text-text-main mb-2">
                 Email Address
               </label>
               <input
@@ -82,10 +86,7 @@ export default function AdminLoginPage() {
             </div>
 
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-text-main mb-2"
-              >
+              <label htmlFor="password" className="block text-sm font-medium text-text-main mb-2">
                 Password
               </label>
               <div className="relative">
@@ -110,13 +111,7 @@ export default function AdminLoginPage() {
               </div>
             </div>
 
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              loading={loading}
-              className="w-full mt-2"
-            >
+            <Button type="submit" variant="primary" size="lg" loading={loading} className="w-full mt-2">
               Sign In
             </Button>
           </form>

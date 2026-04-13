@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
-import { Plus, Pencil, Trash2, MapPin } from "lucide-react";
+import { Plus, Pencil, Upload, MapPin } from "lucide-react";
 import type { Property } from "@/lib/types";
 import AdminHeader from "@/components/admin/AdminHeader";
 import Badge from "@/components/ui/Badge";
@@ -38,13 +38,22 @@ export default async function PropertiesPage() {
         title="Properties"
         description="Manage your property listings."
         action={
-          <Link
-            href="/admin/dashboard/properties/new"
-            className="flex items-center gap-2 bg-primary text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-primary/90 transition-colors"
-          >
-            <Plus size={16} />
-            Add Property
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/admin/dashboard/properties/import"
+              className="flex items-center gap-2 bg-white border border-gray-200 text-text-main text-sm font-semibold px-4 py-2.5 rounded-xl hover:border-primary hover:text-primary transition-colors"
+            >
+              <Upload size={16} />
+              Import CSV
+            </Link>
+            <Link
+              href="/admin/dashboard/properties/new"
+              className="flex items-center gap-2 bg-primary text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-primary/90 transition-colors"
+            >
+              <Plus size={16} />
+              Add Property
+            </Link>
+          </div>
         }
       />
 

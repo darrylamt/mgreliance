@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -23,28 +24,18 @@ export default function Navbar() {
   const isHomePage = pathname === "/";
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
 
-  const navBg =
-    !isHomePage || scrolled
-      ? "bg-white shadow-md"
-      : "bg-transparent";
-
-  const textColor =
-    !isHomePage || scrolled ? "text-text-main" : "text-white";
-
-  const logoColor =
-    !isHomePage || scrolled ? "text-primary" : "text-white";
+  const isTransparent = isHomePage && !scrolled;
+  const navBg = isTransparent ? "bg-transparent" : "bg-white shadow-md";
+  const textColor = isTransparent ? "text-white" : "text-text-main";
 
   return (
     <header
@@ -52,12 +43,23 @@ export default function Navbar() {
     >
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <span
-            className={`font-playfair text-2xl font-bold ${logoColor} transition-colors duration-300`}
+        <Link href="/" className="flex items-center">
+          <div
+            className={`transition-all duration-300 ${
+              isTransparent
+                ? "bg-white/90 backdrop-blur-sm rounded-xl px-3 py-1.5"
+                : ""
+            }`}
           >
-            MG Reliance
-          </span>
+            <Image
+              src="/logo.jpeg"
+              alt="MG Reliance Property Developers"
+              width={140}
+              height={56}
+              className="h-12 w-auto object-contain"
+              priority
+            />
+          </div>
         </Link>
 
         {/* Desktop Nav */}
