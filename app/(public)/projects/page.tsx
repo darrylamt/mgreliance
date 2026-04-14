@@ -4,9 +4,16 @@ import type { Property } from "@/lib/types";
 import ProjectsClient from "./ProjectsClient";
 
 export const metadata: Metadata = {
-  title: "Properties & Projects | MG Reliance",
+  title: "Properties for Sale & Rent in Accra, Ghana",
   description:
-    "Browse MG Reliance's property listings across Greater Accra — residential, commercial, and land. Find your perfect property in Ghana.",
+    "Browse MG Reliance's property listings across Greater Accra — residential homes, commercial spaces, and land for sale or rent. Filter by location, type, and price.",
+  openGraph: {
+    title: "Properties for Sale & Rent in Accra | MG Reliance",
+    description:
+      "Explore residential, commercial, and land listings across East Legon, Cantonments, Airport Residential, Tema, and beyond.",
+    url: "/projects",
+  },
+  alternates: { canonical: "/projects" },
 };
 
 interface Props {

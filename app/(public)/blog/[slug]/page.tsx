@@ -6,6 +6,10 @@ import { ArrowLeft, Calendar, User, Tag } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 import Badge from "@/components/ui/Badge";
+import JsonLd from "@/components/seo/JsonLd";
+
+const BASE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL || "https://mgrelianceproperty.com";
 
 interface BlogPostPageProps {
   params: { slug: string };
@@ -18,24 +22,43 @@ export async function generateMetadata({
     const supabase = await createClient();
     const { data: post } = await supabase
       .from("posts")
-      .select("title, excerpt, cover_image_url")
+      .select("title, excerpt, cover_image_url, author, published_at, category")
       .eq("slug", params.slug)
       .eq("published", true)
       .single();
 
     if (!post) return { title: "Post Not Found" };
 
+    const description =
+      post.excerpt ||
+      `Read ${post.title} on the MG Reliance Property Developers blog — real estate insights for Accra, Ghana.`;
+
     return {
       title: post.title,
-      description: post.excerpt || undefined,
+      description,
+      authors: post.author ? [{ name: post.author }] : undefined,
       openGraph: {
         title: post.title,
-        description: post.excerpt || undefined,
-        images: post.cover_image_url ? [{ url: post.cover_image_url }] : [],
+        description,
+        url: `/blog/${params.slug}`,
+        type: "article",
+        publishedTime: post.published_at || undefined,
+        authors: post.author ? [post.author] : undefined,
+        tags: post.category ? [post.category] : undefined,
+        images: post.cover_image_url
+          ? [{ url: post.cover_image_url, width: 1200, height: 630, alt: post.title }]
+          : [],
       },
+      twitter: {
+        card: "summary_large_image",
+        title: post.title,
+        description,
+        images: post.cover_image_url ? [post.cover_image_url] : [],
+      },
+      alternates: { canonical: `/blog/${params.slug}` },
     };
   } catch {
-    return { title: "Blog Post" };
+    return { title: "Blog Post | MG Reliance" };
   }
 }
 
@@ -52,8 +75,53 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     notFound();
   }
 
+  const blogPostSchema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "@id": `${BASE_URL}/blog/${post.slug}`,
+    headline: post.title,
+    description: post.excerpt || post.title,
+    url: `${BASE_URL}/blog/${post.slug}`,
+    datePublished: post.published_at || post.created_at,
+    dateModified: post.updated_at || post.published_at || post.created_at,
+    author: {
+      "@type": "Person",
+      name: post.author || "MG Reliance Team",
+    },
+    publisher: {
+      "@type": "Organization",
+      "@id": `${BASE_URL}/#organization`,
+      name: "MG Reliance Property Developers",
+      logo: {
+        "@type": "ImageObject",
+        url: `${BASE_URL}/logo.jpeg`,
+      },
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${BASE_URL}/blog/${post.slug}`,
+    },
+    ...(post.cover_image_url && {
+      image: {
+        "@type": "ImageObject",
+        url: post.cover_image_url,
+        width: 1200,
+        height: 630,
+      },
+    }),
+    ...(post.category && { articleSection: post.category }),
+    isPartOf: {
+      "@type": "Blog",
+      "@id": `${BASE_URL}/blog`,
+      name: "MG Reliance Real Estate Blog",
+      publisher: { "@id": `${BASE_URL}/#organization` },
+    },
+  };
+
   return (
     <>
+      <JsonLd data={blogPostSchema} />
+
       {/* Cover Image */}
       {post.cover_image_url && (
         <div className="relative w-full h-[40vh] min-h-[300px] mt-0">
@@ -70,22 +138,16 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       )}
 
       {/* Post Header */}
-      <div
-        className={`bg-primary ${post.cover_image_url ? "" : "pt-32"} pb-16`}
-      >
+      <div className={`bg-primary ${post.cover_image_url ? "" : "pt-32"} pb-16`}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-white/50 text-sm mb-6">
-            <Link href="/" className="hover:text-white transition-colors">
-              Home
-            </Link>
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-white/50 text-sm mb-6">
+            <Link href="/" className="hover:text-white transition-colors">Home</Link>
             <span>/</span>
-            <Link href="/blog" className="hover:text-white transition-colors">
-              Blog
-            </Link>
+            <Link href="/blog" className="hover:text-white transition-colors">Blog</Link>
             <span>/</span>
             <span className="text-accent line-clamp-1">{post.title}</span>
-          </div>
+          </nav>
 
           {post.category && (
             <div className="mb-4">
@@ -105,7 +167,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             {post.published_at && (
               <div className="flex items-center gap-2">
                 <Calendar size={14} />
-                <span>{formatDate(post.published_at)}</span>
+                <time dateTime={post.published_at}>{formatDate(post.published_at)}</time>
               </div>
             )}
             {post.category && (
@@ -128,7 +190,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           )}
 
           {post.content ? (
-            <div
+            <article
               className="prose-content"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />

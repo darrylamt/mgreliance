@@ -13,9 +13,10 @@ import BlogPreview from "@/components/home/BlogPreview";
 import CTABanner from "@/components/home/CTABanner";
 
 export const metadata: Metadata = {
-  title: "MG Reliance Property Developers | Trusted Real Estate in Accra, Ghana",
+  title: "MG Reliance Property Developers | Real Estate in Accra, Ghana",
   description:
-    "Find your perfect property in Accra with MG Reliance. Residential sales, commercial leasing, land acquisition, and property management across Greater Accra.",
+    "Find your perfect property in Accra with MG Reliance Property Developers. Residential homes, commercial spaces & land for sale or rent across Greater Accra, Ghana. Trusted since 2010.",
+  alternates: { canonical: "/" },
 };
 
 export default async function HomePage() {

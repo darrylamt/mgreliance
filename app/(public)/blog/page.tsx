@@ -7,9 +7,16 @@ import type { Post } from "@/lib/types";
 import PostCard from "@/components/blog/PostCard";
 
 export const metadata: Metadata = {
-  title: "Blog — Real Estate Insights",
+  title: "Blog — Real Estate Insights & Market Updates",
   description:
-    "Expert real estate insights, market updates, and property tips from MG Reliance Property Developers in Accra, Ghana.",
+    "Expert real estate insights, market updates, buying guides, and property tips from MG Reliance Property Developers in Accra, Ghana. Stay informed on the Greater Accra property market.",
+  openGraph: {
+    title: "Real Estate Blog | MG Reliance Property Developers",
+    description:
+      "Market updates, expert advice, and property tips from Accra's trusted real estate team.",
+    url: "/blog",
+  },
+  alternates: { canonical: "/blog" },
 };
 
 export default async function BlogPage() {
