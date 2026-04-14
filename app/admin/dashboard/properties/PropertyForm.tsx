@@ -22,6 +22,7 @@ export default function PropertyForm({ initialData, id }: PropertyFormProps) {
   const [urlInput, setUrlInput] = useState("");
   const [uploadState, setUploadState] = useState<UploadState>("idle");
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [amenityInput, setAmenityInput] = useState("");
 
   const [form, setForm] = useState({
     title: initialData?.title || "",
@@ -31,6 +32,11 @@ export default function PropertyForm({ initialData, id }: PropertyFormProps) {
     description: initialData?.description || "",
     status: initialData?.status || "available",
     featured: initialData?.featured || false,
+    bedrooms: initialData?.bedrooms?.toString() || "",
+    bathrooms: initialData?.bathrooms?.toString() || "",
+    area: initialData?.area?.toString() || "",
+    agent_name: initialData?.agent_name || "",
+    amenities: initialData?.amenities || [] as string[],
     images: initialData?.images || [] as string[],
   });
 
@@ -56,6 +62,18 @@ export default function PropertyForm({ initialData, id }: PropertyFormProps) {
     setForm((prev) => ({ ...prev, images: prev.images.filter((img) => img !== url) }));
   };
 
+  const addAmenity = () => {
+    const trimmed = amenityInput.trim();
+    if (trimmed && !form.amenities.includes(trimmed)) {
+      setForm((prev) => ({ ...prev, amenities: [...prev.amenities, trimmed] }));
+      setAmenityInput("");
+    }
+  };
+
+  const removeAmenity = (amenity: string) => {
+    setForm((prev) => ({ ...prev, amenities: prev.amenities.filter((a) => a !== amenity) }));
+  };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -68,7 +86,6 @@ export default function PropertyForm({ initialData, id }: PropertyFormProps) {
     const errors: string[] = [];
 
     for (const file of Array.from(files)) {
-      // Validate size (10MB max)
       if (file.size > 10 * 1024 * 1024) {
         errors.push(`${file.name} is too large (max 10MB)`);
         continue;
@@ -97,10 +114,7 @@ export default function PropertyForm({ initialData, id }: PropertyFormProps) {
     }
 
     if (uploaded.length > 0) {
-      setForm((prev) => ({
-        ...prev,
-        images: [...prev.images, ...uploaded],
-      }));
+      setForm((prev) => ({ ...prev, images: [...prev.images, ...uploaded] }));
     }
 
     if (errors.length > 0) {
@@ -111,7 +125,6 @@ export default function PropertyForm({ initialData, id }: PropertyFormProps) {
       setTimeout(() => setUploadState("idle"), 2000);
     }
 
-    // Reset the input so the same file can be re-selected if needed
     e.target.value = "";
   };
 
@@ -130,6 +143,11 @@ export default function PropertyForm({ initialData, id }: PropertyFormProps) {
       status: form.status,
       featured: form.featured,
       images: form.images,
+      bedrooms: form.bedrooms ? parseInt(form.bedrooms) : null,
+      bathrooms: form.bathrooms ? parseInt(form.bathrooms) : null,
+      area: form.area ? parseFloat(form.area) : null,
+      agent_name: form.agent_name.trim() || null,
+      amenities: form.amenities,
     };
 
     const { error: dbError } = id
@@ -200,9 +218,9 @@ export default function PropertyForm({ initialData, id }: PropertyFormProps) {
               onChange={handleChange}
               className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 bg-white"
             >
-              <option value="available">Available</option>
+              <option value="available">For Sale</option>
+              <option value="rented">For Rent</option>
               <option value="sold">Sold</option>
-              <option value="rented">Rented</option>
             </select>
           </div>
           <div>
@@ -257,6 +275,105 @@ export default function PropertyForm({ initialData, id }: PropertyFormProps) {
           <label htmlFor="featured" className="text-sm font-medium text-text-main">
             Mark as Featured Property
           </label>
+        </div>
+      </div>
+
+      {/* Property Specs */}
+      <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-5">
+        <h3 className="font-semibold text-xs uppercase tracking-wide text-text-secondary">
+          Property Specs
+        </h3>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div>
+            <label className="block text-sm font-medium text-text-main mb-2">Bedrooms</label>
+            <input
+              name="bedrooms"
+              type="number"
+              min="0"
+              value={form.bedrooms}
+              onChange={handleChange}
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+              placeholder="e.g. 4"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-text-main mb-2">Bathrooms</label>
+            <input
+              name="bathrooms"
+              type="number"
+              min="0"
+              value={form.bathrooms}
+              onChange={handleChange}
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+              placeholder="e.g. 3"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-text-main mb-2">Area (m²)</label>
+            <input
+              name="area"
+              type="number"
+              min="0"
+              step="0.1"
+              value={form.area}
+              onChange={handleChange}
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+              placeholder="e.g. 250"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-text-main mb-2">Agent Name</label>
+            <input
+              name="agent_name"
+              type="text"
+              value={form.agent_name}
+              onChange={handleChange}
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+              placeholder="e.g. Kwame Asante"
+            />
+          </div>
+        </div>
+
+        {/* Amenities */}
+        <div>
+          <label className="block text-sm font-medium text-text-main mb-2">Amenities</label>
+          <div className="flex gap-2 mb-3">
+            <input
+              type="text"
+              value={amenityInput}
+              onChange={(e) => setAmenityInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addAmenity())}
+              className="flex-1 px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+              placeholder="e.g. Swimming Pool, then press Enter"
+            />
+            <button
+              type="button"
+              onClick={addAmenity}
+              className="flex items-center gap-2 px-4 py-3 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-primary/90 transition-colors"
+            >
+              <Plus size={16} /> Add
+            </button>
+          </div>
+          {form.amenities.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {form.amenities.map((amenity) => (
+                <span
+                  key={amenity}
+                  className="inline-flex items-center gap-1.5 bg-primary/10 text-primary text-sm px-3 py-1.5 rounded-full"
+                >
+                  {amenity}
+                  <button
+                    type="button"
+                    onClick={() => removeAmenity(amenity)}
+                    className="text-primary/60 hover:text-primary"
+                  >
+                    <X size={12} />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

@@ -11,6 +11,11 @@ export interface Property {
   status: PropertyStatus;
   images: string[];
   featured: boolean;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  area: number | null;
+  amenities: string[];
+  agent_name: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -37,6 +42,7 @@ export interface ContactSubmission {
   phone: string | null;
   subject: string | null;
   message: string;
+  property_id: string | null;
   read: boolean;
   created_at: string;
 }
@@ -47,4 +53,5 @@ export interface ContactFormData {
   phone?: string;
   subject?: string;
   message: string;
+  property_id?: string;
 }

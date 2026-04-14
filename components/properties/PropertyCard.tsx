@@ -3,8 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Tag } from "lucide-react";
-import Badge from "@/components/ui/Badge";
+import { MapPin, Bed, Bath, Maximize2 } from "lucide-react";
 import type { Property } from "@/lib/types";
 
 interface PropertyCardProps {
@@ -18,10 +17,16 @@ const typeLabels: Record<string, string> = {
   land: "Land",
 };
 
-const statusVariants: Record<string, "success" | "danger" | "warning"> = {
-  available: "success",
-  sold: "danger",
-  rented: "warning",
+const statusLabels: Record<string, string> = {
+  available: "For Sale",
+  rented: "For Rent",
+  sold: "Sold",
+};
+
+const statusColors: Record<string, string> = {
+  available: "bg-accent text-white",
+  rented: "bg-primary text-white",
+  sold: "bg-gray-500 text-white",
 };
 
 const placeholderImages = [
@@ -33,24 +38,20 @@ const placeholderImages = [
   "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=600&q=80",
 ];
 
-export default function PropertyCard({
-  property,
-  index = 0,
-}: PropertyCardProps) {
+export default function PropertyCard({ property, index = 0 }: PropertyCardProps) {
   const imageSrc =
-    property.images?.[0] ||
-    placeholderImages[index % placeholderImages.length];
+    property.images?.[0] || placeholderImages[index % placeholderImages.length];
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.4, delay: (index % 3) * 0.1 }}
-      className="group bg-card rounded-xl overflow-hidden border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+      transition={{ duration: 0.45, delay: (index % 3) * 0.1 }}
+      className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
     >
       {/* Image */}
-      <div className="relative h-52 overflow-hidden">
+      <div className="relative h-56 overflow-hidden">
         <Image
           src={imageSrc}
           alt={property.title}
@@ -58,56 +59,67 @@ export default function PropertyCard({
           className="object-cover group-hover:scale-105 transition-transform duration-500"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
-        {/* Type badge overlay */}
-        <div className="absolute top-3 left-3">
-          <Badge variant="accent">{typeLabels[property.type]}</Badge>
+        {/* Status pill */}
+        <div className="absolute top-4 left-4">
+          <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${statusColors[property.status]}`}>
+            {statusLabels[property.status]}
+          </span>
         </div>
-        {/* Status badge */}
-        <div className="absolute top-3 right-3">
-          <Badge variant={statusVariants[property.status]}>
-            {property.status.charAt(0).toUpperCase() +
-              property.status.slice(1)}
-          </Badge>
+        {/* Type pill */}
+        <div className="absolute top-4 right-4">
+          <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-white/90 text-primary backdrop-blur-sm">
+            {typeLabels[property.type]}
+          </span>
         </div>
+        {/* Price overlay at bottom */}
+        {property.price && (
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-4 pt-8 pb-3">
+            <p className="text-white font-bold text-lg">{property.price}</p>
+          </div>
+        )}
       </div>
 
       {/* Content */}
       <div className="p-5">
-        <h3 className="font-playfair text-lg font-semibold text-text-main mb-2 line-clamp-1">
+        <h3 className="font-playfair text-lg font-semibold text-text-main mb-2 line-clamp-1 group-hover:text-primary transition-colors">
           {property.title}
         </h3>
 
-        <div className="flex items-center gap-1.5 text-text-secondary text-sm mb-3">
-          <MapPin size={14} className="shrink-0 text-accent" />
+        <div className="flex items-center gap-1.5 text-text-secondary text-sm mb-4">
+          <MapPin size={13} className="shrink-0 text-accent" />
           <span className="line-clamp-1">{property.location}</span>
         </div>
 
-        {property.description && (
-          <p className="text-text-secondary text-sm leading-relaxed mb-4 line-clamp-2">
-            {property.description}
-          </p>
+        {/* Specs row */}
+        {(property.bedrooms || property.bathrooms || property.area) && (
+          <div className="flex items-center gap-4 py-3 border-t border-b border-gray-100 mb-4">
+            {property.bedrooms != null && (
+              <div className="flex items-center gap-1.5 text-text-secondary text-sm">
+                <Bed size={15} className="text-primary/60" />
+                <span>{property.bedrooms} Bed{property.bedrooms !== 1 ? "s" : ""}</span>
+              </div>
+            )}
+            {property.bathrooms != null && (
+              <div className="flex items-center gap-1.5 text-text-secondary text-sm">
+                <Bath size={15} className="text-primary/60" />
+                <span>{property.bathrooms} Bath{property.bathrooms !== 1 ? "s" : ""}</span>
+              </div>
+            )}
+            {property.area != null && (
+              <div className="flex items-center gap-1.5 text-text-secondary text-sm">
+                <Maximize2 size={13} className="text-primary/60" />
+                <span>{property.area} m²</span>
+              </div>
+            )}
+          </div>
         )}
 
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-          {property.price ? (
-            <div className="flex items-center gap-1.5">
-              <Tag size={14} className="text-accent" />
-              <span className="font-semibold text-primary text-sm">
-                {property.price}
-              </span>
-            </div>
-          ) : (
-            <span className="text-text-secondary text-xs">
-              Price on request
-            </span>
-          )}
-          <Link
-            href="/contact"
-            className="text-xs font-semibold bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
-          >
-            Enquire
-          </Link>
-        </div>
+        <Link
+          href={`/projects/${property.id}`}
+          className="block w-full text-center text-sm font-semibold bg-primary/5 text-primary border border-primary/20 px-4 py-2.5 rounded-xl hover:bg-primary hover:text-white transition-all duration-200"
+        >
+          View Details
+        </Link>
       </div>
     </motion.div>
   );

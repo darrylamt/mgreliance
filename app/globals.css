@@ -44,6 +44,11 @@ body {
   outline-offset: 2px;
 }
 
+/* Hide scrollbar utility */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* Prose styles for blog content */
 .prose-content h2 {
   font-family: var(--font-playfair);
