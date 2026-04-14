@@ -3,7 +3,6 @@ import { createClient } from "@/lib/supabase/server";
 import type { Property, Post } from "@/lib/types";
 
 import Hero from "@/components/home/Hero";
-import StatsBar from "@/components/home/StatsBar";
 import Categories from "@/components/home/Categories";
 import FeaturedListings from "@/components/home/FeaturedListings";
 import ServicesSection from "@/components/home/ServicesSection";
@@ -68,7 +67,6 @@ export default async function HomePage() {
   return (
     <>
       <Hero />
-      <StatsBar />
       <Categories counts={counts} />
       <FeaturedListings properties={featured} />
       <ServicesSection />

@@ -144,7 +144,24 @@ export default function Hero() {
           </div>
         </motion.div>
 
-
+        {/* Stats */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+          className="flex flex-wrap items-center justify-center gap-8 sm:gap-16 mt-14"
+        >
+          {[
+            { value: "15+", label: "Years Experience" },
+            { value: "500+", label: "Happy Clients" },
+            { value: "1,000+", label: "Properties Sold" },
+          ].map((stat) => (
+            <div key={stat.label} className="text-center">
+              <p className="font-playfair text-3xl font-bold text-accent">{stat.value}</p>
+              <p className="text-white/55 text-sm mt-0.5">{stat.label}</p>
+            </div>
+          ))}
+        </motion.div>
       </div>
 
       {/* Scroll indicator */}
