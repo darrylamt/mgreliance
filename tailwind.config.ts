@@ -18,7 +18,7 @@ const config: Config = {
       },
       fontFamily: {
         playfair: ["var(--font-playfair)", "Georgia", "serif"],
-        inter: ["var(--font-inter)", "system-ui", "sans-serif"],
+        jakarta: ["var(--font-jakarta)", "system-ui", "sans-serif"],
       },
       backgroundImage: {
         "hero-gradient":

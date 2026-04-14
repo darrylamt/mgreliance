@@ -4,7 +4,7 @@
 
 :root {
   --font-playfair: "Playfair Display", Georgia, serif;
-  --font-inter: "Inter", system-ui, sans-serif;
+  --font-jakarta: "Plus Jakarta Sans", system-ui, sans-serif;
 }
 
 html {
@@ -12,7 +12,7 @@ html {
 }
 
 body {
-  font-family: var(--font-inter);
+  font-family: var(--font-jakarta);
   background-color: #f9f7f4;
   color: #1a1a1a;
   -webkit-font-smoothing: antialiased;
