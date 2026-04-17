@@ -93,12 +93,12 @@ export default function PropertyDetailClient({ property, related }: Props) {
     <>
       {/* Hero Image Gallery */}
       <section className="pt-20 bg-primary">
-        <div className="relative h-[55vh] min-h-[400px] overflow-hidden">
+        <div className="relative h-[55vh] min-h-[400px] lg:h-[75vh] overflow-hidden bg-gray-950">
           <Image
             src={images[activeImg]}
             alt={property.title}
             fill
-            className="object-cover"
+            className="object-contain"
             sizes="100vw"
             priority
           />
@@ -294,28 +294,6 @@ export default function PropertyDetailClient({ property, related }: Props) {
             {/* Right — enquiry form */}
             <div className="lg:col-span-1">
               <div className="sticky top-24">
-                {/* Agent Card */}
-                {property.agent_name && (
-                  <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="bg-white rounded-2xl border border-gray-100 p-5 mb-5"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shrink-0">
-                        <span className="text-white font-bold text-lg">
-                          {property.agent_name[0]}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-text-main">{property.agent_name}</p>
-                        <p className="text-xs text-text-secondary">MG Reliance Agent</p>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-
                 {/* Enquiry Form */}
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
@@ -410,8 +388,8 @@ export default function PropertyDetailClient({ property, related }: Props) {
 
                       <p className="text-xs text-text-secondary text-center">
                         Or call us:{" "}
-                        <a href="tel:+233000000000" className="text-primary font-semibold">
-                          +233 000 000 000
+                        <a href="tel:+233244274630" className="text-primary font-semibold">
+                          +233 24 427 4630
                         </a>
                       </p>
                     </form>
