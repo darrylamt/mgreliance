@@ -14,6 +14,10 @@ export interface Property {
   bedrooms: number | null;
   bathrooms: number | null;
   area: number | null;
+  parking: number | null;
+  furnishing: string | null;
+  year_built: number | null;
+  land_size: number | null;
   amenities: string[];
   agent_name: string | null;
   created_at: string;

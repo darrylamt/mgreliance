@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Building2, FileText, MessageSquare, LogOut, ExternalLink } from "lucide-react";
+import { LayoutDashboard, Building2, FileText, MessageSquare, LogOut, ExternalLink, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +14,12 @@ const navItems = [
   { href: "/admin/dashboard/messages", label: "Messages", icon: MessageSquare, exact: false },
 ];
 
-export default function AdminSidebar() {
+interface Props {
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+export default function AdminSidebar({ isOpen, onClose }: Props) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -25,26 +30,47 @@ export default function AdminSidebar() {
     router.refresh();
   };
 
+  const handleNavClick = () => {
+    onClose?.();
+  };
+
   return (
-    <aside className="w-64 bg-primary min-h-screen flex flex-col shrink-0">
+    <aside
+      className={cn(
+        // Mobile: fixed overlay drawer
+        "fixed inset-y-0 left-0 z-30 w-64 bg-primary flex flex-col shrink-0 transition-transform duration-300",
+        // Desktop: static in flow
+        "lg:static lg:translate-x-0 lg:transition-none",
+        // Mobile open/closed
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      )}
+    >
       {/* Logo */}
-      <div className="px-5 py-6 border-b border-white/10">
-        <Link href="/admin/dashboard">
-          <div className="bg-white rounded-xl px-3 py-2 inline-block w-full">
+      <div className="px-5 py-5 border-b border-white/10 flex items-start justify-between gap-2">
+        <Link href="/admin/dashboard" onClick={handleNavClick} className="flex-1">
+          <div className="bg-white rounded-xl px-3 py-2">
             <Image
               src="/logo.jpeg"
               alt="MG Reliance Property Developers"
               width={160}
               height={60}
-              className="h-12 w-auto object-contain mx-auto"
+              className="h-10 w-auto object-contain mx-auto"
             />
           </div>
+          <p className="text-white/40 text-xs mt-2 text-center">Admin Panel</p>
         </Link>
-        <p className="text-white/40 text-xs mt-2 text-center">Admin Panel</p>
+        {/* Close button — mobile only */}
+        <button
+          onClick={onClose}
+          className="lg:hidden text-white/60 hover:text-white p-1 mt-1 shrink-0"
+          aria-label="Close menu"
+        >
+          <X size={20} />
+        </button>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-4" aria-label="Admin navigation">
+      <nav className="flex-1 px-3 py-4 overflow-y-auto" aria-label="Admin navigation">
         <ul className="space-y-1">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -56,6 +82,7 @@ export default function AdminSidebar() {
               <li key={item.href}>
                 <Link
                   href={item.href}
+                  onClick={handleNavClick}
                   className={cn(
                     "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200",
                     isActive
@@ -74,7 +101,7 @@ export default function AdminSidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="px-3 py-4 border-t border-white/10 space-y-1">
+      <div className="px-3 py-4 border-t border-white/10 space-y-1 shrink-0">
         <Link
           href="/"
           target="_blank"

@@ -6,7 +6,8 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   MapPin, Bed, Bath, Maximize2, CheckCircle, ChevronLeft,
-  ChevronRight, Send, Phone, Mail, User, MessageSquare, Loader2, AlertCircle
+  ChevronRight, Send, Phone, Mail, User, MessageSquare, Loader2, AlertCircle,
+  Car, Sofa, CalendarDays, LandPlot
 } from "lucide-react";
 import type { Property } from "@/lib/types";
 import PropertyCard from "@/components/properties/PropertyCard";
@@ -200,7 +201,9 @@ export default function PropertyDetailClient({ property, related }: Props) {
               </motion.div>
 
               {/* Specs */}
-              {(property.bedrooms || property.bathrooms || property.area) && (
+              {(property.bedrooms != null || property.bathrooms != null || property.area != null ||
+                property.parking != null || property.furnishing || property.year_built != null ||
+                property.land_size != null) && (
                 <motion.div
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -210,43 +213,93 @@ export default function PropertyDetailClient({ property, related }: Props) {
                   <h3 className="text-xs font-semibold uppercase tracking-wider text-text-secondary mb-5">
                     Property Details
                   </h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-5">
                     {property.bedrooms != null && (
-                      <div className="text-center">
-                        <div className="w-12 h-12 bg-primary/8 rounded-xl flex items-center justify-center mx-auto mb-2">
-                          <Bed size={20} className="text-primary" />
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-primary/8 rounded-xl flex items-center justify-center shrink-0">
+                          <Bed size={18} className="text-primary" />
                         </div>
-                        <p className="font-semibold text-text-main">{property.bedrooms}</p>
-                        <p className="text-xs text-text-secondary">Bedroom{property.bedrooms !== 1 ? "s" : ""}</p>
+                        <div>
+                          <p className="font-semibold text-text-main">{property.bedrooms}</p>
+                          <p className="text-xs text-text-secondary">Bedroom{property.bedrooms !== 1 ? "s" : ""}</p>
+                        </div>
                       </div>
                     )}
                     {property.bathrooms != null && (
-                      <div className="text-center">
-                        <div className="w-12 h-12 bg-primary/8 rounded-xl flex items-center justify-center mx-auto mb-2">
-                          <Bath size={20} className="text-primary" />
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-primary/8 rounded-xl flex items-center justify-center shrink-0">
+                          <Bath size={18} className="text-primary" />
                         </div>
-                        <p className="font-semibold text-text-main">{property.bathrooms}</p>
-                        <p className="text-xs text-text-secondary">Bathroom{property.bathrooms !== 1 ? "s" : ""}</p>
+                        <div>
+                          <p className="font-semibold text-text-main">{property.bathrooms}</p>
+                          <p className="text-xs text-text-secondary">Bathroom{property.bathrooms !== 1 ? "s" : ""}</p>
+                        </div>
                       </div>
                     )}
                     {property.area != null && (
-                      <div className="text-center">
-                        <div className="w-12 h-12 bg-primary/8 rounded-xl flex items-center justify-center mx-auto mb-2">
-                          <Maximize2 size={20} className="text-primary" />
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-primary/8 rounded-xl flex items-center justify-center shrink-0">
+                          <Maximize2 size={18} className="text-primary" />
                         </div>
-                        <p className="font-semibold text-text-main">{property.area}</p>
-                        <p className="text-xs text-text-secondary">m² Area</p>
+                        <div>
+                          <p className="font-semibold text-text-main">{property.area} m²</p>
+                          <p className="text-xs text-text-secondary">Floor Area</p>
+                        </div>
                       </div>
                     )}
-                    {property.type && (
-                      <div className="text-center">
-                        <div className="w-12 h-12 bg-primary/8 rounded-xl flex items-center justify-center mx-auto mb-2">
-                          <span className="text-primary font-bold text-xs">{typeLabels[property.type][0]}</span>
+                    {property.land_size != null && (
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-primary/8 rounded-xl flex items-center justify-center shrink-0">
+                          <LandPlot size={18} className="text-primary" />
                         </div>
+                        <div>
+                          <p className="font-semibold text-text-main">{property.land_size} m²</p>
+                          <p className="text-xs text-text-secondary">Land Size</p>
+                        </div>
+                      </div>
+                    )}
+                    {property.parking != null && (
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-primary/8 rounded-xl flex items-center justify-center shrink-0">
+                          <Car size={18} className="text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-text-main">{property.parking}</p>
+                          <p className="text-xs text-text-secondary">Parking Space{property.parking !== 1 ? "s" : ""}</p>
+                        </div>
+                      </div>
+                    )}
+                    {property.furnishing && (
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-primary/8 rounded-xl flex items-center justify-center shrink-0">
+                          <Sofa size={18} className="text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-text-main">{property.furnishing}</p>
+                          <p className="text-xs text-text-secondary">Furnishing</p>
+                        </div>
+                      </div>
+                    )}
+                    {property.year_built != null && (
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-primary/8 rounded-xl flex items-center justify-center shrink-0">
+                          <CalendarDays size={18} className="text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-text-main">{property.year_built}</p>
+                          <p className="text-xs text-text-secondary">Year Built</p>
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-primary/8 rounded-xl flex items-center justify-center shrink-0">
+                        <span className="text-primary font-bold text-xs">{typeLabels[property.type][0]}</span>
+                      </div>
+                      <div>
                         <p className="font-semibold text-text-main">{typeLabels[property.type]}</p>
                         <p className="text-xs text-text-secondary">Property Type</p>
                       </div>
-                    )}
+                    </div>
                   </div>
                 </motion.div>
               )}
