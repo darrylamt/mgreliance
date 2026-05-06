@@ -94,12 +94,12 @@ export default function PropertyDetailClient({ property, related }: Props) {
     <>
       {/* Hero Image Gallery */}
       <section className="pt-20 bg-primary">
-        <div className="relative h-[55vh] min-h-[400px] lg:h-[75vh] overflow-hidden bg-gray-950">
+        <div className="relative h-[62vw] min-h-[280px] max-h-[500px] lg:h-[72vh] lg:max-h-none overflow-hidden bg-gray-950">
           <Image
             src={images[activeImg]}
             alt={property.title}
             fill
-            className="object-contain"
+            className="object-cover"
             sizes="100vw"
             priority
           />

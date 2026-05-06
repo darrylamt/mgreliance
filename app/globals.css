@@ -6,7 +6,9 @@
   --font-playfair: "Playfair Display", Georgia, serif;
 }
 
-html {
+html,
+body {
+  overflow-x: hidden;
   scroll-behavior: smooth;
 }
 
