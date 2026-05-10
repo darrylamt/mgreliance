@@ -33,6 +33,8 @@ export default function AboutPreview() {
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
+              {/* Bottom gradient blending into white background */}
+              <div className="absolute bottom-0 inset-x-0 h-28 bg-gradient-to-t from-white/70 to-transparent" />
             </div>
             {/* Floating accent card */}
             <div className="absolute -bottom-6 -right-6 bg-accent text-white p-6 rounded-xl shadow-xl max-w-[200px]">

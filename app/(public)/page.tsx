@@ -8,6 +8,7 @@ import FeaturedListings from "@/components/home/FeaturedListings";
 import ServicesSection from "@/components/home/ServicesSection";
 import FreshListings from "@/components/home/FreshListings";
 import AboutPreview from "@/components/home/AboutPreview";
+import VisionSection from "@/components/home/VisionSection";
 import Testimonials from "@/components/home/Testimonials";
 import BlogPreview from "@/components/home/BlogPreview";
 import CTABanner from "@/components/home/CTABanner";
@@ -73,6 +74,7 @@ export default async function HomePage() {
       <ServicesSection />
       <FreshListings properties={fresh} />
       <AboutPreview />
+      <VisionSection />
       <Testimonials />
       <BlogPreview posts={posts} />
       <CTABanner />

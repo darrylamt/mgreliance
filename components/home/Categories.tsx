@@ -81,6 +81,8 @@ export default function Categories({ counts }: CategoriesProps) {
                 />
                 {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/40 to-transparent" />
+                {/* Fade bottom edge to page background */}
+                <div className="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-white/20 to-transparent" />
 
                 {/* Content */}
                 <div className="absolute inset-0 flex flex-col justify-end p-6">
