@@ -81,7 +81,7 @@ export default function VisionSection() {
           <p className="text-text-secondary leading-relaxed text-base max-w-md mx-auto">
             We take a uniquely personal approach to every client — understanding your
             vision and delivering properties that match it. Renowned for our deep
-            knowledge of Greater Accra's finest locations and our commitment to
+            knowledge of Greater Accra&apos;s finest locations and our commitment to
             making every transaction seamless.
           </p>
 
