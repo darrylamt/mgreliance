@@ -209,7 +209,7 @@ export default function AboutContent() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
                 <div className="relative h-80 md:h-auto min-h-[320px]">
                   <Image
-                    src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&q=80"
+                    src="https://ykxikguqtlkbpturlyhs.supabase.co/storage/v1/object/public/website-content/CEO.jpeg"
                     alt="Wisdom Geotrah, Founder of MG Reliance"
                     fill
                     className="object-cover"
