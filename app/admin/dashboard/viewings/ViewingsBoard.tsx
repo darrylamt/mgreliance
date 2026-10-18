@@ -83,6 +83,13 @@ export default function ViewingsBoard({ viewings, blocks, blocksAvailable, statu
   const [tab, setTab] = useState<"upcoming" | "past" | "cancelled">("upcoming");
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<{
+    status: "confirmed" | "cancelled";
+    name: string;
+    email: string;
+    emailed: boolean;
+    waHref: string | null;
+  } | null>(null);
   const [day, setDay] = useState(days[0]);
 
   const groups = useMemo(() => {
@@ -99,19 +106,36 @@ export default function ViewingsBoard({ viewings, blocks, blocksAvailable, statu
     return Array.from(byDate.entries());
   }, [viewings, tab, today]);
 
-  const setStatus = async (id: string, status: ViewingStatus) => {
-    setBusy(id);
+  const setStatus = async (v: ViewingRow, status: ViewingStatus) => {
+    setBusy(v.id);
     setError(null);
-    const { error: dbError } = await createClient()
-      .from("contact_submissions")
-      .update({ viewing_status: status, read: true })
-      .eq("id", id);
+    setNotice(null);
+    const res = await fetch(`/api/viewings/${v.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    }).catch(() => null);
+    const data = res ? await res.json().catch(() => ({})) : {};
     setBusy(null);
-    if (dbError) {
-      setError(dbError.code === "23505"
+    if (!res || !res.ok) {
+      setError(data.code === "23505"
         ? "Another active booking already holds that slot for this property."
-        : statusAvailable ? dbError.message : MIGRATION_HINT);
+        : statusAvailable ? data.error || "Could not update the booking." : MIGRATION_HINT);
       return;
+    }
+    if (status === "confirmed" || status === "cancelled") {
+      const wa = waNumber(v.phone);
+      const first = v.name.split(" ")[0];
+      const waText = status === "confirmed"
+        ? `Hi ${first}, this is MG Reliance confirming your viewing of "${v.propertyTitle}" on ${longDate(v.date)} at ${v.time}. See you then!`
+        : `Hi ${first}, this is MG Reliance. Unfortunately we have to cancel your viewing of "${v.propertyTitle}" on ${longDate(v.date)} at ${v.time}. Sorry about that — when would suit you instead?`;
+      setNotice({
+        status,
+        name: v.name,
+        email: v.email,
+        emailed: Boolean(data.emailed),
+        waHref: wa ? `https://wa.me/${wa}?text=${encodeURIComponent(waText)}` : null,
+      });
     }
     router.refresh();
   };
@@ -151,6 +175,32 @@ export default function ViewingsBoard({ viewings, blocks, blocksAvailable, statu
           <X size={16} className="mt-0.5 shrink-0" />
           <span className="flex-1">{error}</span>
           <button onClick={() => setError(null)} className="text-red-500 hover:text-red-700" aria-label="Dismiss">
+            <X size={14} />
+          </button>
+        </div>
+      )}
+
+      {notice && (
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-800">
+          <Check size={16} className="shrink-0 hidden sm:block" />
+          <span className="flex-1">
+            {notice.status === "confirmed" ? "Confirmed" : "Cancelled"} {notice.name}&apos;s viewing.{" "}
+            {notice.emailed
+              ? `We emailed ${notice.email}.`
+              : `The email to ${notice.email} could not be sent — let them know on WhatsApp.`}
+          </span>
+          {notice.waHref && (
+            <a
+              href={notice.waHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setNotice(null)}
+              className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-[#25D366] px-3 py-2 text-xs font-semibold text-white hover:bg-[#1fb857]"
+            >
+              <WhatsAppIcon size={13} /> Also send on WhatsApp
+            </a>
+          )}
+          <button onClick={() => setNotice(null)} className="text-green-700 hover:text-green-900 self-end sm:self-auto" aria-label="Dismiss">
             <X size={14} />
           </button>
         </div>
@@ -254,7 +304,7 @@ export default function ViewingsBoard({ viewings, blocks, blocksAvailable, statu
                             {v.status === "pending" && (
                               <button
                                 disabled={busy === v.id}
-                                onClick={() => setStatus(v.id, "confirmed")}
+                                onClick={() => setStatus(v, "confirmed")}
                                 className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary/90 disabled:opacity-50"
                               >
                                 <Check size={13} /> Confirm
@@ -263,7 +313,7 @@ export default function ViewingsBoard({ viewings, blocks, blocksAvailable, statu
                             {v.status === "confirmed" && (
                               <button
                                 disabled={busy === v.id}
-                                onClick={() => setStatus(v.id, "completed")}
+                                onClick={() => setStatus(v, "completed")}
                                 className="inline-flex items-center gap-1.5 rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-semibold text-text-main hover:bg-gray-200 disabled:opacity-50"
                               >
                                 <CheckCheck size={13} /> Mark done
@@ -272,7 +322,7 @@ export default function ViewingsBoard({ viewings, blocks, blocksAvailable, statu
                             {(v.status === "pending" || v.status === "confirmed") && (
                               <button
                                 disabled={busy === v.id}
-                                onClick={() => setStatus(v.id, "cancelled")}
+                                onClick={() => setStatus(v, "cancelled")}
                                 className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50"
                               >
                                 <CalendarX size={13} /> Cancel
@@ -281,7 +331,7 @@ export default function ViewingsBoard({ viewings, blocks, blocksAvailable, statu
                             {(v.status === "cancelled" || v.status === "completed") && v.date >= today && (
                               <button
                                 disabled={busy === v.id}
-                                onClick={() => setStatus(v.id, "pending")}
+                                onClick={() => setStatus(v, "pending")}
                                 className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-text-secondary hover:bg-gray-100 disabled:opacity-50"
                               >
                                 <RotateCcw size={13} /> Reopen

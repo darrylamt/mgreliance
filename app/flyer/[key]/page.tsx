@@ -78,8 +78,8 @@ export default async function FlyerPage({ params }: { params: { key: string } })
         <header className="flex items-center justify-between">
           <img src="/logo.jpeg" alt="MG Reliance Property Developers" className="h-[14mm] w-auto" />
           <div className="flex gap-2">
-            <span className="chip bg-primary text-white">{STATUS_LABELS[property.status]}</span>
-            <span className="chip bg-background text-text-main">{TYPE_LABELS[property.type]}</span>
+            <span className="chip border border-primary text-primary">{STATUS_LABELS[property.status]}</span>
+            <span className="chip border border-line text-text-main">{TYPE_LABELS[property.type]}</span>
           </div>
         </header>
 
@@ -140,19 +140,20 @@ export default async function FlyerPage({ params }: { params: { key: string } })
         </div>
 
         {/* Footer */}
-        <footer className="rounded-[6mm] bg-primary text-white p-[6mm] flex items-center gap-[6mm]">
+        {/* Light footer: dark text stays crisp even if the print dialog drops background colours */}
+        <footer className="rounded-[6mm] border-[0.5mm] border-primary/25 bg-background p-[6mm] flex items-center gap-[6mm]">
           <div
-            className="w-[30mm] h-[30mm] shrink-0 rounded-[3mm] bg-white p-[2.5mm] [&>svg]:w-full [&>svg]:h-full"
+            className="w-[30mm] h-[30mm] shrink-0 rounded-[3mm] bg-white border-[0.3mm] border-line p-[2.5mm] [&>svg]:w-full [&>svg]:h-full"
             dangerouslySetInnerHTML={{ __html: qrSvg }}
           />
           <div className="flex-1 min-w-0">
-            <p className="text-[13pt] font-semibold">Scan to see every photo & book a viewing</p>
-            <p className="text-[9pt] text-white/70 mt-1 break-all">{url.replace(/^https?:\/\//, "")}</p>
+            <p className="text-[13pt] font-semibold text-text-main">Scan to see every photo & book a viewing</p>
+            <p className="text-[9pt] text-text-secondary mt-1 break-all">{url.replace(/^https?:\/\//, "")}</p>
           </div>
           <div className="text-right shrink-0">
-            <p className="text-[8.5pt] text-white/60">WhatsApp or call</p>
-            <p className="text-[15pt] font-semibold tracking-tight">{PHONE_DISPLAY}</p>
-            <p className="text-[8.5pt] text-accent mt-0.5">info@mgrelianceproperties.com</p>
+            <p className="text-[8.5pt] text-text-secondary">WhatsApp or call</p>
+            <p className="text-[15pt] font-semibold tracking-tight text-primary">{PHONE_DISPLAY}</p>
+            <p className="text-[8.5pt] text-text-main mt-0.5">info@mgrelianceproperties.com</p>
           </div>
         </footer>
       </article>

@@ -128,7 +128,44 @@ export default function ShareButton({
     }
   };
 
-  const links = [
+  const facebookHref = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+
+  /**
+   * On phones the Facebook app intercepts sharer.php links and drops the URL, so it just
+   * opens the feed. The native share sheet hands the link to the app properly; desktop
+   * gets the classic sharer popup.
+   */
+  const shareFacebook = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    const touch = window.matchMedia("(pointer: coarse)").matches;
+    if (touch && navigator.share) {
+      try {
+        await navigator.share({ title, text: message, url });
+        done("facebook");
+      } catch {
+        // User cancelled.
+      }
+      return;
+    }
+    const w = 600;
+    const h = 560;
+    const popup = window.open(
+      facebookHref,
+      "fb-share",
+      `width=${w},height=${h},left=${window.screenX + (window.outerWidth - w) / 2},top=${window.screenY + (window.outerHeight - h) / 2}`
+    );
+    if (!popup) window.location.href = facebookHref;
+    done("facebook");
+  };
+
+  const links: {
+    label: string;
+    icon: React.ReactNode;
+    href: string;
+    method: string;
+    color: string;
+    onClick?: (e: React.MouseEvent) => void;
+  }[] = [
     {
       label: "WhatsApp",
       icon: <WhatsAppIcon size={17} />,
@@ -139,8 +176,9 @@ export default function ShareButton({
     {
       label: "Facebook",
       icon: <FacebookIcon />,
-      href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+      href: facebookHref,
       method: "facebook",
+      onClick: shareFacebook,
       color: "text-[#1877F2]",
     },
     {
@@ -164,7 +202,7 @@ export default function ShareButton({
             href={l.href}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => done(l.method)}
+            onClick={l.onClick ?? (() => done(l.method))}
             className="flex flex-col items-center gap-2 rounded-2xl bg-background py-3.5 text-xs font-medium text-text-main hover:bg-line transition-colors"
           >
             <span className={l.color}>{l.icon}</span>
