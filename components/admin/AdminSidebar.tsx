@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Building2, FileText, MessageSquare, LogOut, ExternalLink, X } from "lucide-react";
+import { LayoutDashboard, Building2, FileText, MessageSquare, CalendarCheck, LogOut, ExternalLink, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -11,6 +11,7 @@ const navItems = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/dashboard/properties", label: "Properties", icon: Building2, exact: false },
   { href: "/admin/dashboard/posts", label: "Blog Posts", icon: FileText, exact: false },
+  { href: "/admin/dashboard/viewings", label: "Viewings", icon: CalendarCheck, exact: false },
   { href: "/admin/dashboard/messages", label: "Messages", icon: MessageSquare, exact: false },
 ];
 

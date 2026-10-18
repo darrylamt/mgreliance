@@ -3,6 +3,9 @@ import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
 import { slotsForDate, upcomingViewingDays } from "@/lib/contact";
 import { isUuid, propertyUrl } from "@/lib/urls";
+import { getAvailability, isSlotOpen } from "@/lib/viewings";
+
+const SLOT_TAKEN = "Sorry — that time was just booked. Please pick another slot.";
 import type { SubmissionKind } from "@/lib/types";
 
 // Server-side Supabase client using service role key (bypasses RLS for inserts)
@@ -98,6 +101,13 @@ export async function POST(request: NextRequest) {
       propertyLink = propertyUrl(property);
     }
 
+    if (kind === "viewing") {
+      const availability = await getAvailability(property_id, viewing_date, viewing_date);
+      if (!isSlotOpen(availability, viewing_date, viewing_time)) {
+        return NextResponse.json({ error: SLOT_TAKEN, slotTaken: true }, { status: 409 });
+      }
+    }
+
     const defaultSubject =
       kind === "viewing"
         ? `Viewing request: ${propertyTitle}`
@@ -126,6 +136,10 @@ export async function POST(request: NextRequest) {
       .insert([sanitized]);
 
     if (dbError) {
+      // Unique slot index: someone else booked this slot a moment ago.
+      if (dbError.code === "23505" && kind === "viewing") {
+        return NextResponse.json({ error: SLOT_TAKEN, slotTaken: true }, { status: 409 });
+      }
       console.error("Supabase insert error:", dbError);
       return NextResponse.json(
         { error: "Failed to save your message. Please try again." },

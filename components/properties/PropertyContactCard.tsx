@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Phone, Loader2, AlertCircle, ArrowUpRight, CalendarCheck } from "lucide-react";
 import WhatsAppIcon from "@/components/ui/WhatsAppIcon";
@@ -14,6 +14,12 @@ import {
 import type { Property } from "@/lib/types";
 import { propertyUrl } from "@/lib/urls";
 import { track } from "@/lib/analytics";
+import {
+  EMPTY_AVAILABILITY,
+  dayHasOpenSlot,
+  isSlotOpen,
+  type Availability,
+} from "@/lib/viewing-slots";
 
 type Mode = "enquiry" | "viewing";
 
@@ -49,6 +55,32 @@ export default function PropertyContactCard({ property }: { property: Property }
 
   const slots = slotsForDate(viewingDate);
 
+  // Taken / blocked slots — loaded the first time the visitor opens "Book a viewing".
+  const [availability, setAvailability] = useState<Availability | null>(null);
+  const loadAvailability = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/viewings/availability?property_id=${property.id}`, { cache: "no-store" });
+      const av: Availability = res.ok ? await res.json() : EMPTY_AVAILABILITY;
+      setAvailability(av);
+      return av;
+    } catch {
+      setAvailability(EMPTY_AVAILABILITY);
+      return EMPTY_AVAILABILITY;
+    }
+  }, [property.id]);
+
+  useEffect(() => {
+    if (mode !== "viewing" || availability) return;
+    loadAvailability().then((av) => {
+      // Start on the first day that still has an open slot.
+      setViewingDate((current) =>
+        dayHasOpenSlot(av, current) ? current : days.find((d) => dayHasOpenSlot(av, d)) ?? current
+      );
+    });
+  }, [mode, availability, loadAvailability, days]);
+
+  const av = availability ?? EMPTY_AVAILABILITY;
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     if (error) setError(null);
@@ -56,7 +88,7 @@ export default function PropertyContactCard({ property }: { property: Property }
 
   const pickDate = (date: string) => {
     setViewingDate(date);
-    if (viewingTime && !slotsForDate(date).includes(viewingTime)) setViewingTime(null);
+    if (viewingTime && !isSlotOpen(av, date, viewingTime)) setViewingTime(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -85,6 +117,11 @@ export default function PropertyContactCard({ property }: { property: Property }
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || "Failed to send. Please try again.");
+        if (data.slotTaken) {
+          // Someone beat them to it — refresh the grid so the slot shows as taken.
+          setViewingTime(null);
+          loadAvailability();
+        }
       } else {
         setSent(mode);
         track(mode === "viewing" ? "viewing_request" : "enquiry_submit", { property_id: property.id });
@@ -201,14 +238,16 @@ export default function PropertyContactCard({ property }: { property: Property }
                     {days.map((d) => {
                       const p = dayParts(d);
                       const active = d === viewingDate;
+                      const full = availability !== null && !dayHasOpenSlot(av, d);
                       return (
                         <button
                           key={d}
                           type="button"
                           onClick={() => pickDate(d)}
+                          disabled={full}
                           aria-pressed={active}
-                          aria-label={p.long}
-                          className={`shrink-0 w-14 rounded-2xl py-2.5 text-center transition-colors ${
+                          aria-label={full ? `${p.long} (fully booked)` : p.long}
+                          className={`shrink-0 w-14 rounded-2xl py-2.5 text-center transition-colors disabled:opacity-35 disabled:cursor-not-allowed ${
                             active
                               ? "bg-primary text-white"
                               : "bg-white text-text-main hover:bg-white/70"
@@ -229,26 +268,38 @@ export default function PropertyContactCard({ property }: { property: Property }
 
                 {/* Time slots */}
                 <div>
-                  <p className="text-xs font-medium text-text-secondary mb-2">Choose a time</p>
+                  <p className="text-xs font-medium text-text-secondary mb-2">
+                    Choose a time
+                    {availability && !dayHasOpenSlot(av, viewingDate) && (
+                      <span className="text-red-600"> — this day is fully booked</span>
+                    )}
+                  </p>
                   <div className="grid grid-cols-4 gap-2">
-                    {slots.map((t) => (
-                      <button
-                        key={t}
-                        type="button"
-                        onClick={() => {
-                          setViewingTime(t);
-                          if (error) setError(null);
-                        }}
-                        aria-pressed={viewingTime === t}
-                        className={`rounded-full py-2 text-sm font-medium tabular-nums transition-colors ${
-                          viewingTime === t
-                            ? "bg-primary text-white"
-                            : "bg-white text-text-main hover:bg-white/70"
-                        }`}
-                      >
-                        {t}
-                      </button>
-                    ))}
+                    {slots.map((t) => {
+                      const open = isSlotOpen(av, viewingDate, t);
+                      return (
+                        <button
+                          key={t}
+                          type="button"
+                          disabled={!open || availability === null}
+                          onClick={() => {
+                            setViewingTime(t);
+                            if (error) setError(null);
+                          }}
+                          aria-pressed={viewingTime === t}
+                          aria-label={open ? t : `${t} (unavailable)`}
+                          className={`rounded-full py-2 text-sm font-medium tabular-nums transition-colors disabled:cursor-not-allowed ${
+                            viewingTime === t
+                              ? "bg-primary text-white"
+                              : open
+                                ? "bg-white text-text-main hover:bg-white/70"
+                                : "bg-transparent text-text-secondary/50 line-through"
+                          } ${availability === null ? "animate-pulse" : ""}`}
+                        >
+                          {t}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </div>

@@ -1,12 +1,13 @@
 import { createClient } from "@/lib/supabase/server";
-import { Building2, FileText, MessageSquare, TrendingUp } from "lucide-react";
+import { Building2, FileText, MessageSquare, TrendingUp, CalendarCheck } from "lucide-react";
+import { toISODate } from "@/lib/contact";
 import Link from "next/link";
 import AdminHeader from "@/components/admin/AdminHeader";
 
 async function getStats() {
   try {
     const supabase = await createClient();
-    const [properties, posts, messages, unread] = await Promise.all([
+    const [properties, posts, messages, unread, viewings] = await Promise.all([
       supabase.from("properties").select("id", { count: "exact" }),
       supabase.from("posts").select("id", { count: "exact" }),
       supabase.from("contact_submissions").select("id", { count: "exact" }),
@@ -14,15 +15,25 @@ async function getStats() {
         .from("contact_submissions")
         .select("id", { count: "exact" })
         .eq("read", false),
+      // Upcoming viewing requests that still need a reply (select("*") is safe pre-migration).
+      supabase
+        .from("contact_submissions")
+        .select("*")
+        .eq("kind", "viewing")
+        .gte("viewing_date", toISODate(new Date())),
     ]);
+    const toConfirm = (viewings.data || []).filter(
+      (v) => (v.viewing_status ?? "pending") === "pending"
+    ).length;
     return {
       properties: properties.count ?? 0,
       posts: posts.count ?? 0,
       messages: messages.count ?? 0,
       unread: unread.count ?? 0,
+      toConfirm,
     };
   } catch {
-    return { properties: 0, posts: 0, messages: 0, unread: 0 };
+    return { properties: 0, posts: 0, messages: 0, unread: 0, toConfirm: 0 };
   }
 }
 
@@ -30,6 +41,13 @@ export default async function DashboardPage() {
   const stats = await getStats();
 
   const cards = [
+    {
+      label: "Viewings to Confirm",
+      value: stats.toConfirm,
+      icon: CalendarCheck,
+      href: "/admin/dashboard/viewings",
+      color: "bg-primary/10 text-primary",
+    },
     {
       label: "Total Properties",
       value: stats.properties,
@@ -68,7 +86,7 @@ export default async function DashboardPage() {
       />
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-5 mb-10">
         {cards.map((card) => {
           const Icon = card.icon;
           return (
