@@ -241,7 +241,7 @@ export default function ShareButton({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -6, scale: 0.97 }}
               transition={{ duration: 0.18 }}
-              className="hidden sm:block absolute right-0 top-full mt-2 z-50 w-80 origin-top-right rounded-3xl border border-line bg-white p-2 shadow-soft"
+              className="hidden sm:block absolute right-0 top-full mt-2 z-50 w-80 max-w-[calc(100vw-2rem)] origin-top-right rounded-3xl border border-line bg-white p-2 shadow-soft"
             >
               {menu}
             </motion.div>

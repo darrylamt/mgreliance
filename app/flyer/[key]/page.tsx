@@ -7,6 +7,7 @@ import { isUuid, propertyUrl } from "@/lib/urls";
 import { PHONE_DISPLAY } from "@/lib/contact";
 import type { Property } from "@/lib/types";
 import FlyerToolbar from "./FlyerToolbar";
+import FitToScreen from "./FitToScreen";
 
 export const metadata: Metadata = {
   title: "Property Flyer",
@@ -70,8 +71,8 @@ export default async function FlyerPage({ params }: { params: { key: string } })
 
       <FlyerToolbar backHref={url} />
 
-      {/* A4 sheet: 210 × 297 mm — scrolls sideways on phones rather than reflowing */}
-      <div className="overflow-x-auto print:overflow-visible">
+      {/* A4 sheet: 210 × 297 mm — shrunk to fit on phones, true size when printed */}
+      <FitToScreen>
       <article className="mx-auto bg-white shadow-soft print:shadow-none w-[210mm] h-[297mm] p-[12mm] flex flex-col gap-[6mm] overflow-hidden">
         {/* Header */}
         <header className="flex items-center justify-between">
@@ -155,7 +156,7 @@ export default async function FlyerPage({ params }: { params: { key: string } })
           </div>
         </footer>
       </article>
-      </div>
+      </FitToScreen>
     </div>
   );
 }

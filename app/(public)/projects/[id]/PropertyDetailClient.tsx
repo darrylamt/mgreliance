@@ -183,14 +183,15 @@ export default function PropertyDetailClient({ property, related }: Props) {
                   )}
                 </div>
               </div>
-              <div className="flex items-center gap-4 sm:flex-col sm:items-end sm:gap-3">
+              {/* Phones: price on its own line, buttons share the row below. sm+: right-aligned column. */}
+              <div className="flex flex-col gap-3 sm:items-end shrink-0">
                 {property.price && (
-                  <p className="text-2xl sm:text-3xl font-semibold tracking-tight text-primary whitespace-nowrap">
+                  <p className="text-2xl sm:text-3xl font-semibold tracking-tight text-primary break-words sm:whitespace-nowrap">
                     {property.price}
                   </p>
                 )}
-                <div className="flex items-center gap-2 ml-auto sm:ml-0">
-                  <SaveButton propertyId={property.id} variant="full" className="py-2.5" />
+                <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center">
+                  <SaveButton propertyId={property.id} variant="full" className="py-2.5 w-full sm:w-auto" />
                   <ShareButton
                     url={propertyUrl(property)}
                     title={property.title}
@@ -198,7 +199,7 @@ export default function PropertyDetailClient({ property, related }: Props) {
                     storyImageUrl={`/og/story/${property.slug || property.id}`}
                     flyerUrl={`/flyer/${property.slug || property.id}`}
                     contentType="property"
-                    className="py-2.5"
+                    className="py-2.5 w-full sm:w-auto"
                   />
                 </div>
               </div>
