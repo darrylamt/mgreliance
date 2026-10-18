@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { Home, X, Search, ChevronDown } from "lucide-react";
+import { Home, X, Search, ChevronDown, Link2, Check } from "lucide-react";
 import Link from "next/link";
 import PropertyCard from "@/components/properties/PropertyCard";
 import PageHeader from "@/components/ui/PageHeader";
@@ -85,7 +86,42 @@ export default function ProjectsClient({
     return result;
   }, [properties, type, status, location, sort]);
 
+  // Mirror filters into the URL so searches can be shared, bookmarked and indexed.
+  // history.replaceState is integrated with the App Router (Next 14.1+): no server round trip.
+  const pathname = usePathname();
+  useEffect(() => {
+    const id = setTimeout(() => {
+      const params = new URLSearchParams();
+      if (type) params.set("type", type);
+      if (status) params.set("status", status);
+      if (location.trim()) params.set("location", location.trim());
+      if (sort && sort !== "newest") params.set("sort", sort);
+      const qs = params.toString();
+      const next = qs ? `${pathname}?${qs}` : pathname;
+      if (next !== `${window.location.pathname}${window.location.search}`) {
+        window.history.replaceState(null, "", next);
+      }
+    }, 300);
+    return () => clearTimeout(id);
+  }, [type, status, location, sort, pathname]);
+
   const hasFilters = type || status || location;
+
+  const [copied, setCopied] = useState(false);
+  const shareSearch = async () => {
+    const url = window.location.href;
+    try {
+      if (navigator.share && window.matchMedia("(pointer: coarse)").matches) {
+        await navigator.share({ title: "Properties on MG Reliance", url });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // User cancelled the share sheet or clipboard is blocked — nothing to do.
+    }
+  };
 
   const clearFilters = () => {
     setType("");
@@ -181,8 +217,19 @@ export default function ProjectsClient({
               </button>
             )}
 
-            <div className="w-full sm:w-auto sm:ml-auto text-sm text-text-secondary tabular-nums pt-1 sm:pt-0">
-              {filtered.length} propert{filtered.length !== 1 ? "ies" : "y"}
+            <div className="w-full sm:w-auto sm:ml-auto flex items-center justify-between sm:justify-end gap-3 pt-1 sm:pt-0">
+              <span className="text-sm text-text-secondary tabular-nums">
+                {filtered.length} propert{filtered.length !== 1 ? "ies" : "y"}
+              </span>
+              {hasFilters && (
+                <button
+                  onClick={shareSearch}
+                  className="flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-text-main hover:bg-background transition-colors"
+                >
+                  {copied ? <Check size={14} className="text-primary" /> : <Link2 size={14} />}
+                  {copied ? "Link copied" : "Share search"}
+                </button>
+              )}
             </div>
           </div>
         </div>

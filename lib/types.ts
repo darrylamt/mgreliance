@@ -47,9 +47,14 @@ export interface ContactSubmission {
   subject: string | null;
   message: string;
   property_id: string | null;
+  kind: SubmissionKind;
+  viewing_date: string | null;
+  viewing_time: string | null;
   read: boolean;
   created_at: string;
 }
+
+export type SubmissionKind = "contact" | "enquiry" | "viewing";
 
 export interface ContactFormData {
   full_name: string;
@@ -58,4 +63,7 @@ export interface ContactFormData {
   subject?: string;
   message: string;
   property_id?: string;
+  kind?: SubmissionKind;
+  viewing_date?: string;
+  viewing_time?: string;
 }

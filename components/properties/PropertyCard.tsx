@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { MapPin, ArrowUpRight } from "lucide-react";
 import type { Property } from "@/lib/types";
+import SaveButton from "@/components/properties/SaveButton";
 
 interface PropertyCardProps {
   property: Property;
@@ -77,8 +78,10 @@ export default function PropertyCard({
             </span>
           </div>
 
+          <SaveButton propertyId={property.id} className="absolute top-4 right-4" />
+
           {/* Hover arrow */}
-          <div className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white flex items-center justify-center text-text-main opacity-0 -translate-y-1 scale-90 group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100 transition-all duration-300">
+          <div className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-white flex items-center justify-center text-text-main opacity-0 translate-y-1 scale-90 group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100 transition-all duration-300">
             <ArrowUpRight size={17} />
           </div>
         </div>

@@ -4,9 +4,25 @@ import AdminHeader from "@/components/admin/AdminHeader";
 import { formatDate } from "@/lib/utils";
 import MessageReadToggle from "./MessageReadToggle";
 import PaginationBar from "@/components/admin/PaginationBar";
-import { Mail, MailOpen, Phone } from "lucide-react";
+import Link from "next/link";
+import { Mail, MailOpen, Phone, CalendarCheck, Home } from "lucide-react";
 
 const PAGE_SIZE = 10;
+
+const KIND_BADGES = {
+  contact: { label: "Contact form", className: "bg-gray-100 text-gray-600" },
+  enquiry: { label: "Property enquiry", className: "bg-primary/10 text-primary" },
+  viewing: { label: "Viewing request", className: "bg-accent/15 text-accent-ink" },
+} as const;
+
+function formatViewing(date: string, time: string | null) {
+  const d = new Date(`${date}T12:00:00`).toLocaleDateString("en-GB", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+  });
+  return time ? `${d} at ${time}` : d;
+}
 
 export default async function MessagesPage({
   searchParams,
@@ -20,6 +36,7 @@ export default async function MessagesPage({
   let messages: ContactSubmission[] = [];
   let total = 0;
   let unreadCount = 0;
+  let propertyTitles: Record<string, string> = {};
 
   try {
     const supabase = await createClient();
@@ -36,6 +53,17 @@ export default async function MessagesPage({
       .select("*", { count: "exact", head: true })
       .eq("read", false);
     unreadCount = unread || 0;
+
+    const propertyIds = Array.from(
+      new Set(messages.map((m) => m.property_id).filter((id): id is string => Boolean(id)))
+    );
+    if (propertyIds.length > 0) {
+      const { data: props } = await supabase
+        .from("properties")
+        .select("id, title")
+        .in("id", propertyIds);
+      propertyTitles = Object.fromEntries((props || []).map((p) => [p.id, p.title]));
+    }
   } catch {
     // handle gracefully
   }
@@ -107,7 +135,29 @@ export default async function MessagesPage({
                     {formatDate(message.created_at)}
                   </p>
 
-                  {message.subject && (
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${KIND_BADGES[message.kind || "contact"].className}`}>
+                      {KIND_BADGES[message.kind || "contact"].label}
+                    </span>
+                    {message.kind === "viewing" && message.viewing_date && (
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-text-main">
+                        <CalendarCheck size={12} />
+                        {formatViewing(message.viewing_date, message.viewing_time)}
+                      </span>
+                    )}
+                    {message.property_id && (
+                      <Link
+                        href={`/projects/${message.property_id}`}
+                        target="_blank"
+                        className="inline-flex items-center gap-1 text-xs text-primary hover:text-accent transition-colors"
+                      >
+                        <Home size={12} />
+                        {propertyTitles[message.property_id] || "View property"}
+                      </Link>
+                    )}
+                  </div>
+
+                  {message.subject && message.kind === "contact" && (
                     <p className="text-sm font-medium text-text-main mb-2">
                       {message.subject}
                     </p>

@@ -4,8 +4,9 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Menu, X, ArrowUpRight } from "lucide-react";
+import { Menu, X, ArrowUpRight, Heart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSavedProperties } from "@/lib/useSavedProperties";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -20,6 +21,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+  const savedCount = useSavedProperties().ids.length;
 
   const isHomePage = pathname === "/";
 
@@ -100,28 +102,53 @@ export default function Navbar() {
           })}
         </ul>
 
-        {/* CTA */}
-        <div className="hidden lg:block">
+        <div className="flex items-center gap-1 sm:gap-2">
+          {/* Saved */}
+          <Link
+            href="/saved"
+            aria-label={`Saved properties${savedCount ? ` (${savedCount})` : ""}`}
+            className={`relative w-11 h-11 rounded-full flex items-center justify-center transition-colors ${
+              isTransparent ? "text-white hover:bg-white/10" : "text-text-main hover:bg-background"
+            }`}
+          >
+            <Heart size={19} className={pathname === "/saved" ? "fill-current" : ""} />
+            <AnimatePresence>
+              {savedCount > 0 && (
+                <motion.span
+                  key={savedCount}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  exit={{ scale: 0 }}
+                  transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                  className="absolute top-1.5 right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-accent text-[10px] font-bold text-white flex items-center justify-center tabular-nums"
+                >
+                  {savedCount}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </Link>
+
+          {/* CTA */}
           <Link
             href="/contact"
-            className={`btn py-2.5 ${isTransparent ? "btn-light" : "btn-primary"}`}
+            className={`hidden lg:inline-flex btn py-2.5 ${isTransparent ? "btn-light" : "btn-primary"}`}
           >
             Get started
             <ArrowUpRight size={15} />
           </Link>
-        </div>
 
-        {/* Mobile Hamburger */}
-        <button
-          className={`lg:hidden w-11 h-11 rounded-full flex items-center justify-center transition-colors ${
-            isTransparent ? "text-white hover:bg-white/10" : "text-text-main hover:bg-background"
-          }`}
-          onClick={() => setMobileOpen((v) => !v)}
-          aria-label={mobileOpen ? "Close menu" : "Open menu"}
-          aria-expanded={mobileOpen}
-        >
-          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
+          {/* Mobile Hamburger */}
+          <button
+            className={`lg:hidden w-11 h-11 rounded-full flex items-center justify-center transition-colors ${
+              isTransparent ? "text-white hover:bg-white/10" : "text-text-main hover:bg-background"
+            }`}
+            onClick={() => setMobileOpen((v) => !v)}
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
+          >
+            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </nav>
 
       {/* Mobile Drawer */}

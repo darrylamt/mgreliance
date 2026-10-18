@@ -6,12 +6,12 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   MapPin, Bed, Bath, Maximize2, Check, ChevronLeft, ChevronRight,
-  Phone, Loader2, AlertCircle, ArrowUpRight,
   Car, Sofa, CalendarDays, LandPlot, Building2
 } from "lucide-react";
 import type { Property } from "@/lib/types";
 import PropertyCard from "@/components/properties/PropertyCard";
-import { createClient } from "@/lib/supabase/client";
+import PropertyContactCard from "@/components/properties/PropertyContactCard";
+import SaveButton from "@/components/properties/SaveButton";
 
 interface Props {
   property: Property;
@@ -43,46 +43,6 @@ export default function PropertyDetailClient({ property, related }: Props) {
       : placeholderImages;
 
   const [activeImg, setActiveImg] = useState(0);
-
-  // Enquiry form
-  const [form, setForm] = useState({
-    full_name: "",
-    email: "",
-    phone: "",
-    message: `Hi, I'm interested in "${property.title}". Please contact me with more details.`,
-  });
-  const [sending, setSending] = useState(false);
-  const [sent, setSent] = useState(false);
-  const [sendError, setSendError] = useState<string | null>(null);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleEnquire = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSending(true);
-    setSendError(null);
-
-    try {
-      const supabase = createClient();
-      const { error } = await supabase.from("contact_submissions").insert([{
-        full_name: form.full_name.trim(),
-        email: form.email.trim(),
-        phone: form.phone.trim() || null,
-        subject: `Enquiry: ${property.title}`,
-        message: form.message.trim(),
-        property_id: property.id,
-      }]);
-
-      if (error) throw error;
-      setSent(true);
-    } catch (err: unknown) {
-      setSendError(err instanceof Error ? err.message : "Failed to send. Please try again.");
-    } finally {
-      setSending(false);
-    }
-  };
 
   const specs = [
     property.bedrooms != null && { icon: Bed, value: property.bedrooms, label: `Bedroom${property.bedrooms !== 1 ? "s" : ""}` },
@@ -209,11 +169,14 @@ export default function PropertyDetailClient({ property, related }: Props) {
                   <span>{property.location}</span>
                 </div>
               </div>
-              {property.price && (
-                <p className="text-2xl sm:text-3xl font-semibold tracking-tight text-primary whitespace-nowrap">
-                  {property.price}
-                </p>
-              )}
+              <div className="flex items-center gap-4 sm:flex-col sm:items-end sm:gap-3">
+                {property.price && (
+                  <p className="text-2xl sm:text-3xl font-semibold tracking-tight text-primary whitespace-nowrap">
+                    {property.price}
+                  </p>
+                )}
+                <SaveButton propertyId={property.id} variant="full" className="py-2.5 ml-auto sm:ml-0" />
+              </div>
             </motion.div>
 
             {/* Specs */}
@@ -262,105 +225,15 @@ export default function PropertyDetailClient({ property, related }: Props) {
             )}
           </div>
 
-          {/* Right — enquiry form */}
+          {/* Right — enquiry / viewing */}
           <div className="lg:col-span-1">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3, ease }}
-              className="lg:sticky lg:top-28 bg-background rounded-4xl p-6 sm:p-7"
+              className="lg:sticky lg:top-28"
             >
-              <h3 className="text-xl font-semibold tracking-tight text-text-main">
-                Interested?
-              </h3>
-              <p className="text-sm text-text-secondary mt-1 mb-6">
-                Send an enquiry and we&apos;ll be in touch within 24 hours.
-              </p>
-
-              <AnimatePresence mode="wait">
-                {sent ? (
-                  <motion.div
-                    key="sent"
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="text-center py-10 bg-white rounded-3xl"
-                  >
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: "spring", stiffness: 300, damping: 18, delay: 0.1 }}
-                      className="w-14 h-14 bg-primary rounded-full flex items-center justify-center mx-auto mb-4"
-                    >
-                      <Check size={26} className="text-white" strokeWidth={2.5} />
-                    </motion.div>
-                    <p className="font-semibold text-text-main mb-1">Enquiry sent</p>
-                    <p className="text-text-secondary text-sm">
-                      Our team will get back to you shortly.
-                    </p>
-                  </motion.div>
-                ) : (
-                  <motion.form key="form" exit={{ opacity: 0 }} onSubmit={handleEnquire} className="space-y-3">
-                    {sendError && (
-                      <div className="flex items-center gap-2 bg-red-50 text-red-700 rounded-2xl p-3 text-sm">
-                        <AlertCircle size={14} className="shrink-0" />
-                        {sendError}
-                      </div>
-                    )}
-
-                    <input
-                      name="full_name"
-                      type="text"
-                      required
-                      placeholder="Your name"
-                      aria-label="Your name"
-                      value={form.full_name}
-                      onChange={handleChange}
-                      className="input"
-                    />
-                    <input
-                      name="email"
-                      type="email"
-                      required
-                      placeholder="Email address"
-                      aria-label="Email address"
-                      value={form.email}
-                      onChange={handleChange}
-                      className="input"
-                    />
-                    <input
-                      name="phone"
-                      type="tel"
-                      placeholder="Phone (optional)"
-                      aria-label="Phone"
-                      value={form.phone}
-                      onChange={handleChange}
-                      className="input"
-                    />
-                    <textarea
-                      name="message"
-                      rows={4}
-                      required
-                      aria-label="Message"
-                      value={form.message}
-                      onChange={handleChange}
-                      className="input resize-none"
-                    />
-
-                    <button type="submit" disabled={sending} className="btn btn-primary btn-lg w-full">
-                      {sending ? (
-                        <><Loader2 size={16} className="animate-spin" /> Sending…</>
-                      ) : (
-                        <>Send enquiry <ArrowUpRight size={16} /></>
-                      )}
-                    </button>
-
-                    <a href="tel:+233244274630" className="btn btn-secondary w-full">
-                      <Phone size={15} />
-                      +233 24 427 4630
-                    </a>
-                  </motion.form>
-                )}
-              </AnimatePresence>
+              <PropertyContactCard property={property} />
             </motion.div>
           </div>
         </div>
