@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Calendar, User, Tag } from "lucide-react";
+import { ArrowLeft, ChevronRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 import Badge from "@/components/ui/Badge";
 import JsonLd from "@/components/seo/JsonLd";
+import Reveal from "@/components/ui/Reveal";
+import CTABanner from "@/components/home/CTABanner";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://mgrelianceproperties.com";
@@ -122,69 +124,66 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     <>
       <JsonLd data={blogPostSchema} />
 
+      {/* Post Header */}
+      <header className="pt-36 sm:pt-40 pb-12 bg-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Reveal>
+            <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-sm text-text-secondary mb-8 min-w-0">
+              <Link href="/" className="hover:text-text-main transition-colors">Home</Link>
+              <ChevronRight size={14} className="text-text-secondary/50 shrink-0" />
+              <Link href="/blog" className="hover:text-text-main transition-colors">Blog</Link>
+              <ChevronRight size={14} className="text-text-secondary/50 shrink-0" />
+              <span className="text-text-main line-clamp-1">{post.title}</span>
+            </nav>
+
+            {post.category && (
+              <div className="mb-5">
+                <Badge variant="neutral">{post.category}</Badge>
+              </div>
+            )}
+
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight leading-[1.1] text-text-main">
+              {post.title}
+            </h1>
+
+            <div className="mt-8 flex items-center gap-3 text-sm">
+              <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center text-xs font-semibold shrink-0">
+                {(post.author || "MG Reliance").split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
+              </div>
+              <div>
+                <p className="font-medium text-text-main">{post.author || "MG Reliance"}</p>
+                {post.published_at && (
+                  <time dateTime={post.published_at} className="text-text-secondary">
+                    {formatDate(post.published_at)}
+                  </time>
+                )}
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </header>
+
       {/* Cover Image */}
       {post.cover_image_url && (
-        <div className="relative w-full h-[40vh] min-h-[300px] mt-0">
-          <Image
-            src={post.cover_image_url}
-            alt={post.title}
-            fill
-            priority
-            className="object-cover"
-            sizes="100vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-primary/60 to-primary/20" />
+        <div className="container-page">
+          <Reveal className="relative aspect-[16/9] lg:aspect-[21/9] rounded-4xl overflow-hidden bg-background">
+            <Image
+              src={post.cover_image_url}
+              alt={post.title}
+              fill
+              priority
+              className="object-cover"
+              sizes="100vw"
+            />
+          </Reveal>
         </div>
       )}
 
-      {/* Post Header */}
-      <div className={`bg-primary ${post.cover_image_url ? "" : "pt-32"} pb-16`}>
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Breadcrumb */}
-          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-white/50 text-sm mb-6">
-            <Link href="/" className="hover:text-white transition-colors">Home</Link>
-            <span>/</span>
-            <Link href="/blog" className="hover:text-white transition-colors">Blog</Link>
-            <span>/</span>
-            <span className="text-accent line-clamp-1">{post.title}</span>
-          </nav>
-
-          {post.category && (
-            <div className="mb-4">
-              <Badge variant="accent">{post.category}</Badge>
-            </div>
-          )}
-
-          <h1 className="font-playfair text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-5">
-            {post.title}
-          </h1>
-
-          <div className="flex flex-wrap items-center gap-5 text-sm text-white/60">
-            <div className="flex items-center gap-2">
-              <User size={14} />
-              <span>{post.author || "MG Reliance"}</span>
-            </div>
-            {post.published_at && (
-              <div className="flex items-center gap-2">
-                <Calendar size={14} />
-                <time dateTime={post.published_at}>{formatDate(post.published_at)}</time>
-              </div>
-            )}
-            {post.category && (
-              <div className="flex items-center gap-2">
-                <Tag size={14} />
-                <span>{post.category}</span>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
       {/* Post Content */}
-      <section className="py-16 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-14 sm:py-20 bg-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           {post.excerpt && (
-            <p className="text-lg text-text-secondary font-medium leading-relaxed mb-8 pb-8 border-b border-gray-100">
+            <p className="text-xl text-text-main leading-relaxed mb-10 pb-10 border-b border-line">
               {post.excerpt}
             </p>
           )}
@@ -198,39 +197,19 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <p className="text-text-secondary">No content available.</p>
           )}
 
-          {/* Back to Blog */}
-          <div className="mt-16 pt-8 border-t border-gray-100">
-            <Link
-              href="/blog"
-              className="inline-flex items-center gap-2 text-primary font-semibold hover:text-accent transition-colors group"
-            >
-              <ArrowLeft
-                size={16}
-                className="group-hover:-translate-x-1 transition-transform"
-              />
-              Back to Blog
+          <div className="mt-16 pt-8 border-t border-line">
+            <Link href="/blog" className="link-arrow group">
+              <ArrowLeft size={15} className="transition-transform group-hover:-translate-x-1" />
+              Back to blog
             </Link>
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="bg-background py-16 border-t border-gray-100">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h3 className="font-playfair text-2xl font-bold text-text-main mb-3">
-            Looking for a Property?
-          </h3>
-          <p className="text-text-secondary mb-6">
-            Let our expert team help you find the perfect property in Accra.
-          </p>
-          <Link
-            href="/contact"
-            className="bg-primary text-white font-semibold px-8 py-3 rounded-xl hover:bg-primary/90 transition-colors inline-block"
-          >
-            Get in Touch
-          </Link>
-        </div>
-      </section>
+      <CTABanner
+        title="Looking for a property?"
+        description="Let our expert team help you find the perfect property in Accra."
+      />
     </>
   );
 }

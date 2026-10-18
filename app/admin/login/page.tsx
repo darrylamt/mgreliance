@@ -54,7 +54,7 @@ export default function AdminLoginPage() {
 
         {/* Card */}
         <div className="bg-white rounded-2xl p-8 shadow-2xl">
-          <h2 className="font-playfair text-2xl font-bold text-text-main mb-1">
+          <h2 className="font-display text-2xl font-bold text-text-main mb-1">
             Admin Sign In
           </h2>
           <p className="text-text-secondary text-sm mb-8">

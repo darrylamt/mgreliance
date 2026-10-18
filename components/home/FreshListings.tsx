@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import PropertyCard from "@/components/properties/PropertyCard";
+import Reveal from "@/components/ui/Reveal";
 import type { Property } from "@/lib/types";
 
 interface FreshListingsProps {
@@ -29,55 +30,48 @@ export default function FreshListings({ properties }: FreshListingsProps) {
   if (properties.length === 0) return null;
 
   return (
-    <section className="py-24 bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-10"
-        >
+    <section className="py-24 sm:py-32 bg-white">
+      <div className="container-page">
+        <Reveal className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
-            <p className="text-accent text-sm font-semibold uppercase tracking-widest mb-3">
-              Latest Listings
-            </p>
-            <h2 className="font-playfair text-3xl sm:text-4xl font-bold text-text-main">
-              Fresh on the Market
-            </h2>
+            <p className="eyebrow mb-4">Latest listings</p>
+            <h2 className="heading-lg">Fresh on the market</h2>
           </div>
 
           {/* Tabs */}
-          <div className="flex items-center gap-1 bg-white border border-gray-100 rounded-xl p-1 shadow-sm">
+          <div className="flex items-center gap-1 bg-background rounded-full p-1 w-fit max-w-full overflow-x-auto hide-scrollbar">
             {TABS.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActive(tab.key)}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                  active === tab.key
-                    ? "bg-primary text-white shadow-sm"
-                    : "text-text-secondary hover:text-text-main"
+                className={`relative px-4 sm:px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors duration-200 ${
+                  active === tab.key ? "text-text-main" : "text-text-secondary hover:text-text-main"
                 }`}
               >
-                {tab.label}
+                {active === tab.key && (
+                  <motion.span
+                    layoutId="fresh-tab"
+                    transition={{ type: "spring", stiffness: 400, damping: 34 }}
+                    className="absolute inset-0 rounded-full bg-white shadow-soft"
+                  />
+                )}
+                <span className="relative">{tab.label}</span>
               </button>
             ))}
           </div>
-        </motion.div>
+        </Reveal>
 
-        {/* Grid */}
         <AnimatePresence mode="wait">
           <motion.div
             key={active}
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
+            exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.3 }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-10"
           >
             {filtered.length === 0 ? (
-              <div className="col-span-full text-center py-16 text-text-secondary">
+              <div className="col-span-full text-center py-20 rounded-3xl bg-background text-text-secondary">
                 No properties in this category yet.
               </div>
             ) : (
@@ -88,21 +82,12 @@ export default function FreshListings({ properties }: FreshListingsProps) {
           </motion.div>
         </AnimatePresence>
 
-        {/* View All */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="text-center mt-12"
-        >
-          <Link
-            href="/projects"
-            className="inline-flex items-center gap-2 border border-primary text-primary font-semibold px-8 py-3 rounded-xl hover:bg-primary hover:text-white transition-all duration-200 group"
-          >
-            View All Properties
-            <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform" />
+        <Reveal className="text-center mt-14">
+          <Link href="/projects" className="btn btn-secondary btn-lg group">
+            View all properties
+            <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
           </Link>
-        </motion.div>
+        </Reveal>
       </div>
     </section>
   );

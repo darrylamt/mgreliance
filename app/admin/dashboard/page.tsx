@@ -95,7 +95,7 @@ export default async function DashboardPage() {
 
       {/* Quick Actions */}
       <div className="bg-white rounded-xl border border-gray-100 p-6">
-        <h2 className="font-playfair text-lg font-semibold text-text-main mb-5">
+        <h2 className="font-display text-lg font-semibold text-text-main mb-5">
           Quick Actions
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

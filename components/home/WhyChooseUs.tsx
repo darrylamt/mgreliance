@@ -40,7 +40,7 @@ export default function WhyChooseUs() {
           <p className="text-accent text-sm font-semibold uppercase tracking-widest mb-3">
             Why MG Reliance
           </p>
-          <h2 className="font-playfair text-3xl sm:text-4xl font-bold text-text-main mb-4">
+          <h2 className="font-display text-3xl sm:text-4xl font-bold text-text-main mb-4">
             The MG Reliance Difference
           </h2>
           <p className="text-text-secondary max-w-xl mx-auto">
@@ -68,7 +68,7 @@ export default function WhyChooseUs() {
                 <div className="w-14 h-14 bg-primary rounded-xl flex items-center justify-center mb-6">
                   <Icon size={24} className="text-white" />
                 </div>
-                <h3 className="font-playfair text-xl font-semibold text-text-main mb-3">
+                <h3 className="font-display text-xl font-semibold text-text-main mb-3">
                   {reason.title}
                 </h3>
                 <p className="text-text-secondary text-sm leading-relaxed">

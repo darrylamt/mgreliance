@@ -1,116 +1,94 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Home, Building2, TreePine, Settings, FileSearch, Handshake } from "lucide-react";
 import Link from "next/link";
+import { Home, Building2, TreePine, Settings, FileSearch, Handshake, ArrowRight } from "lucide-react";
+import Reveal from "@/components/ui/Reveal";
 
 const services = [
   {
     icon: Home,
     title: "Residential Sales",
     description:
-      "Matching families with their ideal homes across Greater Accra. Expert guidance through every step of the buying and selling process.",
+      "Matching families with their ideal homes, with expert guidance through every step of buying and selling.",
   },
   {
     icon: Building2,
     title: "Commercial Leasing",
     description:
-      "Helping businesses find the perfect commercial spaces — from offices to retail units. Efficient, hassle-free, and results-driven.",
+      "Offices, retail units and warehouses — efficient, hassle-free and results-driven.",
   },
   {
     icon: TreePine,
     title: "Land Acquisition",
     description:
-      "Navigating the complexities of land purchase and investment. Detailed market insights for residential and commercial land.",
+      "Navigating land purchase with due diligence and clear market insight.",
   },
   {
     icon: Settings,
     title: "Property Management",
     description:
-      "Full-service management including tenant relations, maintenance coordination, and financial reporting.",
+      "Tenant relations, maintenance coordination and financial reporting, handled for you.",
   },
   {
     icon: FileSearch,
     title: "Property Valuation",
     description:
-      "Accurate, data-driven property valuations to help you make informed buying, selling, and investment decisions.",
+      "Accurate, data-driven valuations so you can buy, sell and invest with confidence.",
   },
   {
     icon: Handshake,
     title: "Investment Advisory",
     description:
-      "Strategic property investment guidance tailored to your financial goals — from buy-to-let to portfolio diversification.",
+      "Strategic guidance tailored to your goals — from buy-to-let to portfolio growth.",
   },
 ];
 
 export default function ServicesSection() {
   return (
-    <section className="py-24 bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <p className="text-accent text-sm font-semibold uppercase tracking-widest mb-3">
-            What We Offer
-          </p>
-          <h2 className="font-playfair text-3xl sm:text-4xl font-bold text-text-main mb-4">
-            Our Core Services
-          </h2>
-          <p className="text-text-secondary max-w-2xl mx-auto">
-            Comprehensive real estate solutions tailored to the unique needs of every client
-            — from first-time buyers to seasoned investors.
-          </p>
-        </motion.div>
+    <section className="py-24 sm:py-32 bg-white">
+      <div className="container-page">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+          <Reveal className="lg:col-span-4 lg:sticky lg:top-32 self-start">
+            <p className="eyebrow mb-4">What we offer</p>
+            <h2 className="heading-lg">Everything you need, under one roof.</h2>
+            <p className="mt-5 text-text-secondary leading-relaxed">
+              Real estate solutions for every client — from first-time buyers
+              to seasoned investors.
+            </p>
+            <Link href="/services" className="btn btn-primary mt-8 group">
+              Explore services
+              <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
+            </Link>
+          </Reveal>
 
-        {/* 3x2 Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {services.map((service, index) => {
-            const Icon = service.icon;
-            return (
-              <motion.div
-                key={service.title}
-                initial={{ opacity: 0, y: 28 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.08 }}
-                className="group bg-white rounded-2xl p-8 border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
-              >
-                <div className="w-14 h-14 bg-primary/8 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-primary transition-colors duration-300">
-                  <Icon
-                    size={24}
-                    className="text-primary group-hover:text-white transition-colors duration-300"
-                  />
-                </div>
-                <h3 className="font-playfair text-lg font-semibold text-text-main mb-3">
-                  {service.title}
-                </h3>
-                <p className="text-text-secondary text-sm leading-relaxed">
-                  {service.description}
-                </p>
-              </motion.div>
-            );
-          })}
+          <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {services.map((service, index) => {
+              const Icon = service.icon;
+              return (
+                <motion.div
+                  key={service.title}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.6, delay: (index % 2) * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                  whileHover={{ y: -4 }}
+                  className="group rounded-3xl bg-background p-7 transition-colors duration-300 hover:bg-primary"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center mb-10 transition-colors duration-300 group-hover:bg-white/10">
+                    <Icon size={20} className="text-primary transition-colors duration-300 group-hover:text-accent" />
+                  </div>
+                  <h3 className="text-lg font-semibold tracking-tight text-text-main transition-colors duration-300 group-hover:text-white">
+                    {service.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-text-secondary transition-colors duration-300 group-hover:text-white/70">
+                    {service.description}
+                  </p>
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="text-center mt-12"
-        >
-          <Link
-            href="/services"
-            className="inline-flex items-center gap-2 bg-primary text-white font-semibold px-8 py-3 rounded-xl hover:bg-primary/90 transition-colors"
-          >
-            Explore All Services
-          </Link>
-        </motion.div>
       </div>
     </section>
   );

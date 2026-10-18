@@ -11,18 +11,22 @@ const config: Config = {
       colors: {
         primary: "#1a3c34",
         accent: "#c9a84c",
-        background: "#ffffff",
-        "text-main": "#1a1a1a",
-        "text-secondary": "#6b7280",
+        "accent-ink": "#8a6d24",
+        background: "#f6f5f2",
+        "text-main": "#141414",
+        "text-secondary": "#6b6b66",
+        line: "#e9e7e2",
         card: "#ffffff",
       },
       fontFamily: {
-        playfair: ["var(--font-playfair)", "Georgia", "serif"],
-        poppins: ["var(--font-poppins)", "Poppins", "system-ui", "sans-serif"],
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        display: ["var(--font-sans)", "system-ui", "sans-serif"],
       },
-      backgroundImage: {
-        "hero-gradient":
-          "linear-gradient(to bottom, rgba(26,60,52,0.7) 0%, rgba(26,60,52,0.4) 60%, rgba(26,60,52,0.7) 100%)",
+      borderRadius: {
+        "4xl": "2rem",
+      },
+      boxShadow: {
+        soft: "0 1px 2px rgba(20,20,20,0.04), 0 8px 24px -12px rgba(20,20,20,0.12)",
       },
     },
   },

@@ -60,7 +60,7 @@ export default function StatsBar() {
                 <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mx-auto mb-4">
                   <Icon size={22} className="text-accent" />
                 </div>
-                <div className="font-playfair text-4xl font-bold text-accent mb-1">
+                <div className="font-display text-4xl font-bold text-accent mb-1">
                   <CountUp target={stat.value} suffix={stat.suffix} />
                 </div>
                 <div className="text-white/65 text-sm font-medium">{stat.label}</div>

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useRef, useState } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Search, MapPin } from "lucide-react";
+import { Search, MapPin, Building2 } from "lucide-react";
+import CountUp from "@/components/ui/CountUp";
 
 const LOCATIONS = [
   "East Legon",
@@ -19,11 +20,23 @@ const LOCATIONS = [
   "Accra Central",
 ];
 
+const ease = [0.22, 1, 0.36, 1] as const;
+
+const HEADLINE = [["Find", "your", "place"], ["in", "Accra."]];
+
 export default function Hero() {
   const router = useRouter();
   const [status, setStatus] = useState<"available" | "rented">("available");
   const [location, setLocation] = useState("");
   const [type, setType] = useState("");
+
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
+  const imageY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
 
   const handleSearch = () => {
     const params = new URLSearchParams();
@@ -33,151 +46,177 @@ export default function Hero() {
     router.push(`/projects?${params.toString()}`);
   };
 
+  let wordIndex = 0;
+
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background */}
-      <Image
-        src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=80"
-        alt="Luxury property in Accra, Ghana"
-        fill
-        priority
-        className="object-cover object-center"
-        sizes="100vw"
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-primary/85 via-primary/65 to-primary/85" />
-
-      {/* Content */}
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-32">
-        {/* Eyebrow */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 bg-accent/20 border border-accent/40 text-accent text-sm font-semibold px-4 py-2 rounded-full mb-6"
-        >
-          <span className="w-1.5 h-1.5 bg-accent rounded-full" />
-          Trusted Real Estate in Ghana
+    <section ref={sectionRef} className="p-2 sm:p-3 bg-white">
+      <div className="relative min-h-[calc(100svh-1rem)] sm:min-h-[calc(100svh-1.5rem)] rounded-4xl overflow-hidden flex items-end">
+        {/* Background with parallax + slow zoom */}
+        <motion.div style={{ y: imageY }} className="absolute inset-0">
+          <motion.div
+            initial={{ scale: 1.15 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 2.4, ease }}
+            className="absolute inset-0"
+          >
+            <Image
+              src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=80"
+              alt="Luxury property in Accra, Ghana"
+              fill
+              priority
+              className="object-cover object-center"
+              sizes="100vw"
+            />
+          </motion.div>
         </motion.div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-black/25" />
 
-        {/* Heading */}
-        <motion.h1
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1 }}
-          className="font-playfair text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-tight mb-6"
-        >
-          Find Your Dream
-          <br />
-          <span className="text-accent">Property</span> in Accra
-        </motion.h1>
-
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-white/75 text-lg sm:text-xl max-w-2xl mx-auto mb-10"
-        >
-          Residential, commercial & land opportunities across Greater Accra —
-          curated by MG Reliance Property Developers.
-        </motion.p>
-
-        {/* Search Box */}
+        {/* Content */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.3 }}
-          className="bg-white rounded-2xl shadow-2xl p-3 max-w-3xl mx-auto"
+          style={{ opacity: contentOpacity }}
+          className="relative z-10 w-full container-page pt-32 pb-10 sm:pb-14"
         >
-          {/* Status Toggle */}
-          <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-3 w-fit mx-auto">
-            {(["available", "rented"] as const).map((s) => (
-              <button
-                key={s}
-                onClick={() => setStatus(s)}
-                className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                  status === s
-                    ? "bg-primary text-white shadow-sm"
-                    : "text-text-secondary hover:text-text-main"
-                }`}
-              >
-                {s === "available" ? "For Sale" : "For Rent"}
-              </button>
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2, ease }}
+            className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md border border-white/15 px-4 py-1.5 text-xs font-medium text-white/90 mb-6"
+          >
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent" />
+            </span>
+            Trusted real estate in Ghana since 2010
+          </motion.p>
+
+          <h1 className="text-[2.75rem] leading-[1.02] sm:text-6xl lg:text-[5.5rem] font-semibold tracking-tight text-white max-w-4xl">
+            {HEADLINE.map((line, li) => (
+              <span key={li} className="block">
+                {line.map((word) => {
+                  const i = wordIndex++;
+                  return (
+                    <span key={word} className="inline-block overflow-hidden align-bottom pb-[0.08em] mr-[0.22em]">
+                      <motion.span
+                        initial={{ y: "110%" }}
+                        animate={{ y: 0 }}
+                        transition={{ duration: 0.9, delay: 0.3 + i * 0.07, ease }}
+                        className={`inline-block ${word === "place" ? "text-accent" : ""}`}
+                      >
+                        {word}
+                      </motion.span>
+                    </span>
+                  );
+                })}
+              </span>
             ))}
+          </h1>
+
+          <div className="mt-8 flex flex-col lg:flex-row lg:items-end justify-between gap-10">
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.75, ease }}
+              className="text-white/75 text-base sm:text-lg max-w-md leading-relaxed"
+            >
+              Residential, commercial and land opportunities across Greater
+              Accra — curated by MG Reliance Property Developers.
+            </motion.p>
+
+            {/* Stats */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.85, ease }}
+              className="flex gap-6 sm:gap-12"
+            >
+              {[
+                { value: 15, suffix: "+", label: "Years" },
+                { value: 500, suffix: "+", label: "Clients" },
+                { value: 1000, suffix: "+", label: "Properties sold" },
+              ].map((stat) => (
+                <div key={stat.label}>
+                  <p className="text-2xl sm:text-3xl font-semibold text-white tracking-tight tabular-nums">
+                    <CountUp to={stat.value} suffix={stat.suffix} />
+                  </p>
+                  <p className="text-white/60 text-xs sm:text-sm mt-1">{stat.label}</p>
+                </div>
+              ))}
+            </motion.div>
           </div>
 
-          {/* Filters */}
-          <div className="flex flex-col sm:flex-row gap-2">
-            <div className="flex-1 flex items-center gap-2 border border-gray-200 rounded-xl px-4 py-3">
-              <MapPin size={15} className="text-accent shrink-0" />
+          {/* Search */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.95, ease }}
+            className="mt-8 sm:mt-10 bg-white rounded-3xl lg:rounded-full p-2 shadow-2xl shadow-black/20 flex flex-col lg:flex-row lg:items-center gap-2 max-w-4xl"
+          >
+            {/* Status toggle */}
+            <div className="relative flex bg-background rounded-full p-1 shrink-0">
+              {(["available", "rented"] as const).map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setStatus(s)}
+                  className={`relative flex-1 px-5 py-2.5 rounded-full text-sm font-semibold transition-colors ${
+                    status === s ? "text-white" : "text-text-secondary hover:text-text-main"
+                  }`}
+                >
+                  {status === s && (
+                    <motion.span
+                      layoutId="hero-status"
+                      transition={{ type: "spring", stiffness: 400, damping: 34 }}
+                      className="absolute inset-0 rounded-full bg-primary"
+                    />
+                  )}
+                  <span className="relative">{s === "available" ? "Buy" : "Rent"}</span>
+                </button>
+              ))}
+            </div>
+
+            <label className="flex-1 flex items-center gap-2.5 px-4 py-3 rounded-full hover:bg-background transition-colors cursor-pointer">
+              <MapPin size={16} className="text-text-secondary shrink-0" />
               <select
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="w-full bg-transparent text-sm text-text-main focus:outline-none"
+                aria-label="Location"
+                className="w-full bg-transparent text-sm font-medium text-text-main focus:outline-none cursor-pointer"
               >
-                <option value="">All Locations</option>
+                <option value="">All locations</option>
                 {LOCATIONS.map((loc) => (
                   <option key={loc} value={loc}>{loc}</option>
                 ))}
               </select>
-            </div>
+            </label>
 
-            <div className="flex-1 flex items-center gap-2 border border-gray-200 rounded-xl px-4 py-3">
+            <div className="hidden lg:block w-px h-6 bg-line" />
+
+            <label className="flex-1 flex items-center gap-2.5 px-4 py-3 rounded-full hover:bg-background transition-colors cursor-pointer">
+              <Building2 size={16} className="text-text-secondary shrink-0" />
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value)}
-                className="w-full bg-transparent text-sm text-text-main focus:outline-none"
+                aria-label="Property type"
+                className="w-full bg-transparent text-sm font-medium text-text-main focus:outline-none cursor-pointer"
               >
-                <option value="">All Property Types</option>
+                <option value="">All property types</option>
                 <option value="residential">Residential</option>
                 <option value="commercial">Commercial</option>
                 <option value="land">Land</option>
               </select>
-            </div>
+            </label>
 
-            <button
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
               onClick={handleSearch}
-              className="flex items-center justify-center gap-2 bg-primary text-white font-semibold px-8 py-3 rounded-xl hover:bg-primary/90 transition-colors shrink-0"
+              className="btn btn-primary btn-lg shrink-0"
             >
               <Search size={16} />
               Search
-            </button>
-          </div>
-        </motion.div>
-
-        {/* Stats */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
-          className="flex flex-wrap items-center justify-center gap-8 sm:gap-16 mt-14"
-        >
-          {[
-            { value: "15+", label: "Years Experience" },
-            { value: "500+", label: "Happy Clients" },
-            { value: "1,000+", label: "Properties Sold" },
-          ].map((stat) => (
-            <div key={stat.label} className="text-center">
-              <p className="font-playfair text-3xl font-bold text-accent">{stat.value}</p>
-              <p className="text-white/55 text-sm mt-0.5">{stat.label}</p>
-            </div>
-          ))}
+            </motion.button>
+          </motion.div>
         </motion.div>
       </div>
-
-      {/* Scroll indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.2 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-      >
-        <span className="text-white/40 text-xs uppercase tracking-widest">Scroll</span>
-        <motion.div
-          animate={{ y: [0, 6, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-          className="w-px h-8 bg-gradient-to-b from-white/40 to-transparent"
-        />
-      </motion.div>
     </section>
   );
 }

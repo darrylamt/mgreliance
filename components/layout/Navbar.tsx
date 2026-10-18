@@ -4,14 +4,14 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ArrowUpRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/services", label: "Services" },
-  { href: "/projects", label: "Projects" },
+  { href: "/projects", label: "Properties" },
   { href: "/blog", label: "Blog" },
   { href: "/contact", label: "Contact" },
 ];
@@ -25,6 +25,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
+    handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -33,22 +34,25 @@ export default function Navbar() {
     setMobileOpen(false);
   }, [pathname]);
 
-  const isTransparent = isHomePage && !scrolled;
-  const navBg = isTransparent ? "bg-transparent" : "bg-white shadow-md";
-  const textColor = isTransparent ? "text-white" : "text-text-main";
+  const isTransparent = isHomePage && !scrolled && !mobileOpen;
+
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${navBg}`}
-    >
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+    <header className="fixed top-0 inset-x-0 z-50 px-3 sm:px-4 pt-3">
+      <nav
+        className={`max-w-7xl mx-auto h-16 pl-3 pr-2 sm:pl-4 flex items-center justify-between rounded-full transition-all duration-300 ${
+          isTransparent
+            ? "bg-transparent"
+            : "bg-white/85 backdrop-blur-xl border border-line shadow-soft"
+        }`}
+      >
         {/* Logo */}
-        <Link href="/" className="flex items-center">
-          <div
-            className={`transition-all duration-300 ${
-              isTransparent
-                ? "bg-white/90 backdrop-blur-sm rounded-xl px-3 py-1.5"
-                : ""
+        <Link href="/" className="flex items-center shrink-0">
+          <span
+            className={`rounded-full transition-all duration-300 ${
+              isTransparent ? "bg-white px-3 py-1" : ""
             }`}
           >
             <Image
@@ -56,51 +60,67 @@ export default function Navbar() {
               alt="MG Reliance Property Developers"
               width={140}
               height={56}
-              className="h-12 w-auto object-contain"
+              className="h-9 w-auto object-contain"
               priority
             />
-          </div>
+          </span>
         </Link>
 
         {/* Desktop Nav */}
-        <ul className="hidden lg:flex items-center gap-8">
+        <ul className="hidden lg:flex items-center gap-1">
           {navLinks.map((link) => {
-            const isActive = pathname === link.href;
+            const active = isActive(link.href);
             return (
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className={`text-sm font-medium transition-colors duration-200 relative group ${textColor}`}
+                  className={`relative isolate block px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 ${
+                    isTransparent
+                      ? active
+                        ? "text-white"
+                        : "text-white/75 hover:text-white"
+                      : active
+                        ? "text-text-main"
+                        : "text-text-secondary hover:text-text-main"
+                  }`}
                 >
+                  {active && (
+                    <motion.span
+                      layoutId="nav-active"
+                      transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                      className={`absolute inset-0 -z-10 rounded-full ${
+                        isTransparent ? "bg-white/15" : "bg-background"
+                      }`}
+                    />
+                  )}
                   {link.label}
-                  <span
-                    className={`absolute -bottom-1 left-0 h-0.5 bg-accent transition-all duration-200 ${
-                      isActive ? "w-full" : "w-0 group-hover:w-full"
-                    }`}
-                  />
                 </Link>
               </li>
             );
           })}
         </ul>
 
-        {/* CTA Button */}
+        {/* CTA */}
         <div className="hidden lg:block">
           <Link
             href="/contact"
-            className="bg-accent text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-accent/90 transition-colors duration-200"
+            className={`btn py-2.5 ${isTransparent ? "btn-light" : "btn-primary"}`}
           >
-            Get Started
+            Get started
+            <ArrowUpRight size={15} />
           </Link>
         </div>
 
         {/* Mobile Hamburger */}
         <button
-          className={`lg:hidden p-2 rounded-lg transition-colors ${textColor}`}
+          className={`lg:hidden w-11 h-11 rounded-full flex items-center justify-center transition-colors ${
+            isTransparent ? "text-white hover:bg-white/10" : "text-text-main hover:bg-background"
+          }`}
           onClick={() => setMobileOpen((v) => !v)}
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileOpen}
         >
-          {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </nav>
 
@@ -108,36 +128,31 @@ export default function Navbar() {
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
-            className="lg:hidden bg-white border-t border-gray-100 shadow-lg"
+            className="lg:hidden max-w-7xl mx-auto mt-2 bg-white rounded-3xl border border-line shadow-soft"
           >
-            <ul className="px-4 py-4 flex flex-col gap-1">
-              {navLinks.map((link) => {
-                const isActive = pathname === link.href;
-                return (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className={`block px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                        isActive
-                          ? "bg-primary/10 text-primary font-semibold"
-                          : "text-text-main hover:bg-gray-50"
-                      }`}
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                );
-              })}
+            <ul className="p-3 flex flex-col gap-1">
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className={`block px-4 py-3 rounded-2xl text-[15px] font-medium transition-colors ${
+                      isActive(link.href)
+                        ? "bg-background text-text-main"
+                        : "text-text-secondary hover:text-text-main"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
               <li className="pt-2">
-                <Link
-                  href="/contact"
-                  className="block w-full text-center bg-accent text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-accent/90 transition-colors"
-                >
-                  Get Started
+                <Link href="/contact" className="btn btn-primary w-full">
+                  Get started
+                  <ArrowUpRight size={15} />
                 </Link>
               </li>
             </ul>

@@ -1,9 +1,10 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowUpRight } from "lucide-react";
+import Reveal from "@/components/ui/Reveal";
 
 interface CategoriesProps {
   counts: {
@@ -17,88 +18,74 @@ const categories = [
   {
     key: "residential" as const,
     label: "Residential",
-    description: "Luxury homes, apartments & townhouses for families and individuals.",
+    description: "Homes, apartments and townhouses.",
     image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80",
   },
   {
     key: "commercial" as const,
     label: "Commercial",
-    description: "Office spaces, retail units & warehouses for growing businesses.",
+    description: "Offices, retail units and warehouses.",
     image: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80",
   },
   {
     key: "land" as const,
     label: "Land",
-    description: "Prime plots and land parcels for development and investment.",
+    description: "Prime plots for development and investment.",
     image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80",
   },
 ];
 
 export default function Categories({ counts }: CategoriesProps) {
   return (
-    <section className="py-24 bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-14"
-        >
-          <p className="text-accent text-sm font-semibold uppercase tracking-widest mb-3">
-            Browse by Category
+    <section className="py-24 sm:py-32 bg-white">
+      <div className="container-page">
+        <Reveal className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div>
+            <p className="eyebrow mb-4">Browse by category</p>
+            <h2 className="heading-lg max-w-lg">What are you looking for?</h2>
+          </div>
+          <p className="text-text-secondary max-w-sm leading-relaxed">
+            Explore our portfolio of residential, commercial and land listings
+            across Greater Accra.
           </p>
-          <h2 className="font-playfair text-3xl sm:text-4xl font-bold text-text-main mb-4">
-            What Are You Looking For?
-          </h2>
-          <p className="text-text-secondary max-w-xl mx-auto">
-            Explore our portfolio across residential, commercial, and land categories
-            — all located across Greater Accra.
-          </p>
-        </motion.div>
+        </Reveal>
 
-        {/* Category Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
           {categories.map((cat, index) => (
             <motion.div
               key={cat.key}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 32 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.12 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.7, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
             >
               <Link
                 href={`/projects?type=${cat.key}`}
-                className="group relative block rounded-2xl overflow-hidden h-72 shadow-md hover:shadow-xl transition-all duration-300"
+                className="group relative block rounded-3xl overflow-hidden aspect-[4/5] md:aspect-[3/4]"
               >
                 <Image
                   src={cat.image}
                   alt={cat.label}
                   fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.07]"
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/40 to-transparent" />
-                {/* Fade bottom edge to page background */}
-                <div className="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-white/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
-                {/* Content */}
-                <div className="absolute inset-0 flex flex-col justify-end p-6">
-                  <span className="inline-block bg-accent text-white text-xs font-bold px-3 py-1 rounded-full mb-3 w-fit">
-                    {counts[cat.key]} Listing{counts[cat.key] !== 1 ? "s" : ""}
-                  </span>
-                  <h3 className="font-playfair text-2xl font-bold text-white mb-2">
-                    {cat.label}
-                  </h3>
-                  <p className="text-white/70 text-sm mb-4 line-clamp-2">
-                    {cat.description}
-                  </p>
-                  <div className="flex items-center gap-2 text-accent text-sm font-semibold">
-                    Explore {cat.label}
-                    <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform" />
+                <span className="chip absolute top-5 left-5 bg-white/90 text-text-main backdrop-blur-md">
+                  {counts[cat.key]} listing{counts[cat.key] !== 1 ? "s" : ""}
+                </span>
+
+                <div className="absolute inset-x-0 bottom-0 p-6 flex items-end justify-between gap-4">
+                  <div>
+                    <h3 className="text-2xl font-semibold tracking-tight text-white">
+                      {cat.label}
+                    </h3>
+                    <p className="text-white/70 text-sm mt-1">{cat.description}</p>
                   </div>
+                  <span className="w-11 h-11 shrink-0 rounded-full bg-white text-text-main flex items-center justify-center transition-transform duration-300 group-hover:rotate-45">
+                    <ArrowUpRight size={18} />
+                  </span>
                 </div>
               </Link>
             </motion.div>

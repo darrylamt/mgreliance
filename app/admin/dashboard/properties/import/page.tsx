@@ -273,7 +273,7 @@ export default function ImportPropertiesPage() {
           <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle size={28} className="text-green-600" />
           </div>
-          <h3 className="font-playfair text-xl font-bold text-text-main mb-2">
+          <h3 className="font-display text-xl font-bold text-text-main mb-2">
             Import Complete
           </h3>
           <p className="text-text-secondary text-sm mb-6">

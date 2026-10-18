@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  MapPin, Bed, Bath, Maximize2, CheckCircle, ChevronLeft,
-  ChevronRight, Send, Phone, Mail, User, MessageSquare, Loader2, AlertCircle,
-  Car, Sofa, CalendarDays, LandPlot
+  MapPin, Bed, Bath, Maximize2, Check, ChevronLeft, ChevronRight,
+  Phone, Loader2, AlertCircle, ArrowUpRight,
+  Car, Sofa, CalendarDays, LandPlot, Building2
 } from "lucide-react";
 import type { Property } from "@/lib/types";
 import PropertyCard from "@/components/properties/PropertyCard";
@@ -34,12 +34,6 @@ const statusLabels: Record<string, string> = {
   available: "For Sale",
   rented: "For Rent",
   sold: "Sold",
-};
-
-const statusColors: Record<string, string> = {
-  available: "bg-accent text-white",
-  rented: "bg-primary text-white",
-  sold: "bg-gray-400 text-white",
 };
 
 export default function PropertyDetailClient({ property, related }: Props) {
@@ -90,378 +84,294 @@ export default function PropertyDetailClient({ property, related }: Props) {
     }
   };
 
+  const specs = [
+    property.bedrooms != null && { icon: Bed, value: property.bedrooms, label: `Bedroom${property.bedrooms !== 1 ? "s" : ""}` },
+    property.bathrooms != null && { icon: Bath, value: property.bathrooms, label: `Bathroom${property.bathrooms !== 1 ? "s" : ""}` },
+    property.area != null && { icon: Maximize2, value: `${property.area} m²`, label: "Floor area" },
+    property.land_size != null && { icon: LandPlot, value: `${property.land_size} m²`, label: "Land size" },
+    property.parking != null && { icon: Car, value: property.parking, label: `Parking space${property.parking !== 1 ? "s" : ""}` },
+    property.furnishing && { icon: Sofa, value: property.furnishing, label: "Furnishing" },
+    property.year_built != null && { icon: CalendarDays, value: property.year_built, label: "Year built" },
+    { icon: Building2, value: typeLabels[property.type], label: "Property type" },
+  ].filter(Boolean) as { icon: typeof Bed; value: string | number; label: string }[];
+
+  const ease = [0.22, 1, 0.36, 1] as const;
+
   return (
     <>
-      {/* Hero Image Gallery */}
-      <section className="pt-20 bg-primary">
-        <div className="relative h-[62vw] min-h-[280px] max-h-[500px] lg:h-[72vh] lg:max-h-none overflow-hidden bg-gray-950">
-          <Image
-            src={images[activeImg]}
-            alt={property.title}
-            fill
-            className="object-cover"
-            sizes="100vw"
-            priority
-          />
-          <div className="absolute inset-0 bg-black/20" />
+      <section className="pt-24 sm:pt-28 bg-white">
+        <div className="container-page">
+          {/* Breadcrumb */}
+          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-sm text-text-secondary mb-6 min-w-0">
+            <Link href="/" className="hover:text-text-main transition-colors">Home</Link>
+            <ChevronRight size={14} className="text-text-secondary/50 shrink-0" />
+            <Link href="/projects" className="hover:text-text-main transition-colors">Properties</Link>
+            <ChevronRight size={14} className="text-text-secondary/50 shrink-0" />
+            <span className="text-text-main line-clamp-1">{property.title}</span>
+          </nav>
 
-          {/* Status + Type */}
-          <div className="absolute top-6 left-6 flex gap-2">
-            <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${statusColors[property.status]}`}>
-              {statusLabels[property.status]}
-            </span>
-            <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-white/90 text-primary">
-              {typeLabels[property.type]}
-            </span>
-          </div>
+          {/* Gallery */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease }}
+            className="relative aspect-[4/3] sm:aspect-[16/9] lg:aspect-[21/9] rounded-4xl overflow-hidden bg-background"
+          >
+            <AnimatePresence initial={false}>
+              <motion.div
+                key={activeImg}
+                initial={{ opacity: 0, scale: 1.04 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.6, ease }}
+                className="absolute inset-0"
+              >
+                <Image
+                  src={images[activeImg]}
+                  alt={property.title}
+                  fill
+                  className="object-cover"
+                  sizes="100vw"
+                  priority={activeImg === 0}
+                />
+              </motion.div>
+            </AnimatePresence>
 
-          {/* Image Nav */}
+            <div className="absolute top-5 left-5 flex gap-2 z-10">
+              <span className="chip bg-white/90 text-text-main backdrop-blur-md">
+                {statusLabels[property.status]}
+              </span>
+              <span className="chip bg-white/90 text-text-main backdrop-blur-md">
+                {typeLabels[property.type]}
+              </span>
+            </div>
+
+            {images.length > 1 && (
+              <>
+                <button
+                  onClick={() => setActiveImg((i) => (i === 0 ? images.length - 1 : i - 1))}
+                  aria-label="Previous image"
+                  className="absolute z-10 left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/90 backdrop-blur-md text-text-main flex items-center justify-center hover:bg-white hover:scale-105 transition-all"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                <button
+                  onClick={() => setActiveImg((i) => (i === images.length - 1 ? 0 : i + 1))}
+                  aria-label="Next image"
+                  className="absolute z-10 right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/90 backdrop-blur-md text-text-main flex items-center justify-center hover:bg-white hover:scale-105 transition-all"
+                >
+                  <ChevronRight size={20} />
+                </button>
+                <span className="chip absolute z-10 bottom-5 right-5 bg-black/50 text-white backdrop-blur-md tabular-nums">
+                  {activeImg + 1} / {images.length}
+                </span>
+              </>
+            )}
+          </motion.div>
+
+          {/* Thumbnails */}
           {images.length > 1 && (
-            <>
-              <button
-                onClick={() => setActiveImg((i) => Math.max(0, i - 1))}
-                disabled={activeImg === 0}
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 transition-colors disabled:opacity-30"
-              >
-                <ChevronLeft size={20} />
-              </button>
-              <button
-                onClick={() => setActiveImg((i) => Math.min(images.length - 1, i + 1))}
-                disabled={activeImg === images.length - 1}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 transition-colors disabled:opacity-30"
-              >
-                <ChevronRight size={20} />
-              </button>
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
-                {images.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActiveImg(i)}
-                    className={`rounded-full transition-all ${i === activeImg ? "w-5 h-2 bg-white" : "w-2 h-2 bg-white/50"}`}
-                  />
-                ))}
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Thumbnail strip */}
-        {images.length > 1 && (
-          <div className="bg-primary/90 px-4 py-3">
-            <div className="max-w-7xl mx-auto flex gap-2 overflow-x-auto pb-1">
+            <div className="mt-3 flex gap-2 overflow-x-auto hide-scrollbar p-1 -m-1">
               {images.map((img, i) => (
                 <button
                   key={i}
                   onClick={() => setActiveImg(i)}
-                  className={`relative shrink-0 w-20 h-14 rounded-lg overflow-hidden border-2 transition-colors ${
-                    i === activeImg ? "border-accent" : "border-transparent opacity-60 hover:opacity-80"
+                  aria-label={`Show image ${i + 1}`}
+                  className={`relative shrink-0 w-24 h-16 sm:w-28 sm:h-20 rounded-2xl overflow-hidden transition-all duration-300 ${
+                    i === activeImg ? "ring-2 ring-primary ring-offset-2" : "opacity-60 hover:opacity-100"
                   }`}
                 >
-                  <Image src={img} alt="" fill className="object-cover" sizes="80px" />
+                  <Image src={img} alt="" fill className="object-cover" sizes="112px" />
                 </button>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </section>
 
       {/* Main Content */}
-      <section className="py-16 bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm text-text-secondary mb-8">
-            <Link href="/" className="hover:text-primary transition-colors">Home</Link>
-            <span>/</span>
-            <Link href="/projects" className="hover:text-primary transition-colors">Properties</Link>
-            <span>/</span>
-            <span className="text-text-main line-clamp-1">{property.title}</span>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-            {/* Left — details */}
-            <div className="lg:col-span-2 space-y-8">
-              {/* Title & Price */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <h1 className="font-playfair text-3xl sm:text-4xl font-bold text-text-main mb-3">
+      <section className="py-12 sm:py-16 bg-white">
+        <div className="container-page grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-16">
+          {/* Left — details */}
+          <div className="lg:col-span-2 space-y-12">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2, ease }}
+              className="flex flex-col sm:flex-row sm:items-end justify-between gap-4"
+            >
+              <div>
+                <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-text-main leading-tight">
                   {property.title}
                 </h1>
-                <div className="flex items-center gap-2 text-text-secondary mb-4">
-                  <MapPin size={16} className="text-accent shrink-0" />
+                <div className="mt-3 flex items-center gap-1.5 text-text-secondary">
+                  <MapPin size={15} className="shrink-0" />
                   <span>{property.location}</span>
                 </div>
-                {property.price && (
-                  <p className="font-playfair text-2xl font-bold text-primary">
-                    {property.price}
-                  </p>
-                )}
-              </motion.div>
-
-              {/* Specs */}
-              {(property.bedrooms != null || property.bathrooms != null || property.area != null ||
-                property.parking != null || property.furnishing || property.year_built != null ||
-                property.land_size != null) && (
-                <motion.div
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.1 }}
-                  className="bg-white rounded-2xl border border-gray-100 p-6"
-                >
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-text-secondary mb-5">
-                    Property Details
-                  </h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-5">
-                    {property.bedrooms != null && (
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-primary/8 rounded-xl flex items-center justify-center shrink-0">
-                          <Bed size={18} className="text-primary" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-text-main">{property.bedrooms}</p>
-                          <p className="text-xs text-text-secondary">Bedroom{property.bedrooms !== 1 ? "s" : ""}</p>
-                        </div>
-                      </div>
-                    )}
-                    {property.bathrooms != null && (
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-primary/8 rounded-xl flex items-center justify-center shrink-0">
-                          <Bath size={18} className="text-primary" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-text-main">{property.bathrooms}</p>
-                          <p className="text-xs text-text-secondary">Bathroom{property.bathrooms !== 1 ? "s" : ""}</p>
-                        </div>
-                      </div>
-                    )}
-                    {property.area != null && (
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-primary/8 rounded-xl flex items-center justify-center shrink-0">
-                          <Maximize2 size={18} className="text-primary" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-text-main">{property.area} m²</p>
-                          <p className="text-xs text-text-secondary">Floor Area</p>
-                        </div>
-                      </div>
-                    )}
-                    {property.land_size != null && (
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-primary/8 rounded-xl flex items-center justify-center shrink-0">
-                          <LandPlot size={18} className="text-primary" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-text-main">{property.land_size} m²</p>
-                          <p className="text-xs text-text-secondary">Land Size</p>
-                        </div>
-                      </div>
-                    )}
-                    {property.parking != null && (
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-primary/8 rounded-xl flex items-center justify-center shrink-0">
-                          <Car size={18} className="text-primary" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-text-main">{property.parking}</p>
-                          <p className="text-xs text-text-secondary">Parking Space{property.parking !== 1 ? "s" : ""}</p>
-                        </div>
-                      </div>
-                    )}
-                    {property.furnishing && (
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-primary/8 rounded-xl flex items-center justify-center shrink-0">
-                          <Sofa size={18} className="text-primary" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-text-main">{property.furnishing}</p>
-                          <p className="text-xs text-text-secondary">Furnishing</p>
-                        </div>
-                      </div>
-                    )}
-                    {property.year_built != null && (
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-primary/8 rounded-xl flex items-center justify-center shrink-0">
-                          <CalendarDays size={18} className="text-primary" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-text-main">{property.year_built}</p>
-                          <p className="text-xs text-text-secondary">Year Built</p>
-                        </div>
-                      </div>
-                    )}
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-primary/8 rounded-xl flex items-center justify-center shrink-0">
-                        <span className="text-primary font-bold text-xs">{typeLabels[property.type][0]}</span>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-text-main">{typeLabels[property.type]}</p>
-                        <p className="text-xs text-text-secondary">Property Type</p>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
+              </div>
+              {property.price && (
+                <p className="text-2xl sm:text-3xl font-semibold tracking-tight text-primary whitespace-nowrap">
+                  {property.price}
+                </p>
               )}
+            </motion.div>
 
-              {/* Description */}
-              {property.description && (
-                <motion.div
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.15 }}
-                  className="bg-white rounded-2xl border border-gray-100 p-6"
-                >
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-text-secondary mb-4">
-                    About This Property
-                  </h3>
-                  <p className="text-text-secondary leading-relaxed whitespace-pre-line">
-                    {property.description}
-                  </p>
-                </motion.div>
-              )}
-
-              {/* Amenities */}
-              {property.amenities && property.amenities.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
-                  className="bg-white rounded-2xl border border-gray-100 p-6"
-                >
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-text-secondary mb-4">
-                    Amenities & Features
-                  </h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {property.amenities.map((amenity) => (
-                      <div key={amenity} className="flex items-center gap-2">
-                        <CheckCircle size={15} className="text-accent shrink-0" />
-                        <span className="text-sm text-text-main">{amenity}</span>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </div>
-
-            {/* Right — enquiry form */}
-            <div className="lg:col-span-1">
-              <div className="sticky top-24">
-                {/* Enquiry Form */}
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: 0.1 }}
-                  className="bg-white rounded-2xl border border-gray-100 p-6"
-                >
-                  <h3 className="font-playfair text-xl font-semibold text-text-main mb-5">
-                    Enquire About This Property
-                  </h3>
-
-                  {sent ? (
-                    <div className="text-center py-8">
-                      <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <CheckCircle size={28} className="text-green-500" />
-                      </div>
-                      <p className="font-semibold text-text-main mb-2">Enquiry Sent!</p>
-                      <p className="text-text-secondary text-sm">
-                        Our team will get back to you within 24 hours.
-                      </p>
-                    </div>
-                  ) : (
-                    <form onSubmit={handleEnquire} className="space-y-4">
-                      {sendError && (
-                        <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 text-sm">
-                          <AlertCircle size={14} className="shrink-0" />
-                          {sendError}
-                        </div>
-                      )}
-
-                      <div className="relative">
-                        <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                        <input
-                          name="full_name"
-                          type="text"
-                          required
-                          placeholder="Your Name"
-                          value={form.full_name}
-                          onChange={handleChange}
-                          className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
-                        />
-                      </div>
-
-                      <div className="relative">
-                        <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                        <input
-                          name="email"
-                          type="email"
-                          required
-                          placeholder="Email Address"
-                          value={form.email}
-                          onChange={handleChange}
-                          className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
-                        />
-                      </div>
-
-                      <div className="relative">
-                        <Phone size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                        <input
-                          name="phone"
-                          type="tel"
-                          placeholder="Phone (optional)"
-                          value={form.phone}
-                          onChange={handleChange}
-                          className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
-                        />
-                      </div>
-
-                      <div className="relative">
-                        <MessageSquare size={15} className="absolute left-3.5 top-4 text-gray-400" />
-                        <textarea
-                          name="message"
-                          rows={4}
-                          required
-                          value={form.message}
-                          onChange={handleChange}
-                          className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 resize-none"
-                        />
-                      </div>
-
-                      <button
-                        type="submit"
-                        disabled={sending}
-                        className="w-full flex items-center justify-center gap-2 bg-primary text-white font-semibold py-3 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-70"
-                      >
-                        {sending ? (
-                          <><Loader2 size={16} className="animate-spin" /> Sending…</>
-                        ) : (
-                          <><Send size={15} /> Send Enquiry</>
-                        )}
-                      </button>
-
-                      <p className="text-xs text-text-secondary text-center">
-                        Or call us:{" "}
-                        <a href="tel:+233244274630" className="text-primary font-semibold">
-                          +233 24 427 4630
-                        </a>
-                      </p>
-                    </form>
-                  )}
-                </motion.div>
+            {/* Specs */}
+            <div>
+              <h2 className="text-sm font-semibold text-text-main mb-4">Property details</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {specs.map(({ icon: Icon, value, label }, i) => (
+                  <motion.div
+                    key={label}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.3 + i * 0.04, ease }}
+                    className="rounded-3xl bg-background p-5"
+                  >
+                    <Icon size={18} className="text-primary mb-6" />
+                    <p className="font-semibold text-text-main">{value}</p>
+                    <p className="text-xs text-text-secondary mt-0.5">{label}</p>
+                  </motion.div>
+                ))}
               </div>
             </div>
+
+            {property.description && (
+              <div className="pt-12 border-t border-line">
+                <h2 className="text-sm font-semibold text-text-main mb-4">About this property</h2>
+                <p className="text-text-secondary leading-relaxed whitespace-pre-line text-[15px]">
+                  {property.description}
+                </p>
+              </div>
+            )}
+
+            {property.amenities && property.amenities.length > 0 && (
+              <div className="pt-12 border-t border-line">
+                <h2 className="text-sm font-semibold text-text-main mb-5">Amenities &amp; features</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {property.amenities.map((amenity) => (
+                    <div key={amenity} className="flex items-center gap-3">
+                      <span className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                        <Check size={11} className="text-primary" strokeWidth={3} />
+                      </span>
+                      <span className="text-sm text-text-main">{amenity}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right — enquiry form */}
+          <div className="lg:col-span-1">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3, ease }}
+              className="lg:sticky lg:top-28 bg-background rounded-4xl p-6 sm:p-7"
+            >
+              <h3 className="text-xl font-semibold tracking-tight text-text-main">
+                Interested?
+              </h3>
+              <p className="text-sm text-text-secondary mt-1 mb-6">
+                Send an enquiry and we&apos;ll be in touch within 24 hours.
+              </p>
+
+              <AnimatePresence mode="wait">
+                {sent ? (
+                  <motion.div
+                    key="sent"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="text-center py-10 bg-white rounded-3xl"
+                  >
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 18, delay: 0.1 }}
+                      className="w-14 h-14 bg-primary rounded-full flex items-center justify-center mx-auto mb-4"
+                    >
+                      <Check size={26} className="text-white" strokeWidth={2.5} />
+                    </motion.div>
+                    <p className="font-semibold text-text-main mb-1">Enquiry sent</p>
+                    <p className="text-text-secondary text-sm">
+                      Our team will get back to you shortly.
+                    </p>
+                  </motion.div>
+                ) : (
+                  <motion.form key="form" exit={{ opacity: 0 }} onSubmit={handleEnquire} className="space-y-3">
+                    {sendError && (
+                      <div className="flex items-center gap-2 bg-red-50 text-red-700 rounded-2xl p-3 text-sm">
+                        <AlertCircle size={14} className="shrink-0" />
+                        {sendError}
+                      </div>
+                    )}
+
+                    <input
+                      name="full_name"
+                      type="text"
+                      required
+                      placeholder="Your name"
+                      aria-label="Your name"
+                      value={form.full_name}
+                      onChange={handleChange}
+                      className="input"
+                    />
+                    <input
+                      name="email"
+                      type="email"
+                      required
+                      placeholder="Email address"
+                      aria-label="Email address"
+                      value={form.email}
+                      onChange={handleChange}
+                      className="input"
+                    />
+                    <input
+                      name="phone"
+                      type="tel"
+                      placeholder="Phone (optional)"
+                      aria-label="Phone"
+                      value={form.phone}
+                      onChange={handleChange}
+                      className="input"
+                    />
+                    <textarea
+                      name="message"
+                      rows={4}
+                      required
+                      aria-label="Message"
+                      value={form.message}
+                      onChange={handleChange}
+                      className="input resize-none"
+                    />
+
+                    <button type="submit" disabled={sending} className="btn btn-primary btn-lg w-full">
+                      {sending ? (
+                        <><Loader2 size={16} className="animate-spin" /> Sending…</>
+                      ) : (
+                        <>Send enquiry <ArrowUpRight size={16} /></>
+                      )}
+                    </button>
+
+                    <a href="tel:+233244274630" className="btn btn-secondary w-full">
+                      <Phone size={15} />
+                      +233 24 427 4630
+                    </a>
+                  </motion.form>
+                )}
+              </AnimatePresence>
+            </motion.div>
           </div>
         </div>
       </section>
 
       {/* Related Properties */}
       {related.length > 0 && (
-        <section className="py-16 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-text-main mb-8">
-              Similar Properties
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <section className="py-16 sm:py-24 bg-white border-t border-line">
+          <div className="container-page">
+            <h2 className="heading-lg mb-10">Similar properties</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-10">
               {related.map((p, i) => (
                 <PropertyCard key={p.id} property={p} index={i} />
               ))}

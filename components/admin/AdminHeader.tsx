@@ -14,7 +14,7 @@ export default function AdminHeader({
   return (
     <div className="flex items-start justify-between mb-8">
       <div>
-        <h1 className="font-playfair text-2xl font-bold text-text-main">
+        <h1 className="font-display text-2xl font-bold text-text-main">
           {title}
         </h1>
         {description && (

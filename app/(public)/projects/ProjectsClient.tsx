@@ -2,10 +2,11 @@
 
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Home, MessageCircle, X } from "lucide-react";
+import { Home, X, Search, ChevronDown } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import PropertyCard from "@/components/properties/PropertyCard";
+import PageHeader from "@/components/ui/PageHeader";
+import CTABanner from "@/components/home/CTABanner";
 import type { Property } from "@/lib/types";
 
 interface ProjectsClientProps {
@@ -48,7 +49,6 @@ export default function ProjectsClient({
   const [status, setStatus] = useState(initialStatus);
   const [location, setLocation] = useState(initialLocation);
   const [sort, setSort] = useState(initialSort);
-  const [showFilters, setShowFilters] = useState(false);
 
   const filtered = useMemo(() => {
     let result = [...properties];
@@ -96,158 +96,141 @@ export default function ProjectsClient({
 
   return (
     <>
-      {/* Page Hero */}
-      <section className="relative pt-40 pb-20 bg-primary overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <Image
-            src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80"
-            alt=""
-            fill
-            className="object-cover"
-            sizes="100vw"
-          />
-        </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2 text-white/50 text-sm mb-4">
-            <Link href="/" className="hover:text-white transition-colors">Home</Link>
-            <span>/</span>
-            <span className="text-accent">Properties</span>
-          </div>
-          <h1 className="font-playfair text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4">
-            Our Properties
-          </h1>
-          <p className="text-white/70 text-lg max-w-2xl">
-            Explore our curated selection of residential, commercial, and land
-            opportunities across Greater Accra.
-          </p>
-        </div>
-      </section>
+      <PageHeader
+        eyebrow="Properties"
+        title="Find a place that fits."
+        description="A curated selection of residential, commercial and land opportunities across Greater Accra."
+        crumbs={[{ label: "Properties" }]}
+      />
 
       {/* Filter Bar */}
-      <section className="sticky top-0 z-30 bg-white border-b border-gray-100 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex flex-wrap items-center gap-3">
+      <section className="lg:sticky lg:top-[5.25rem] z-30 bg-white/85 backdrop-blur-xl">
+        <div className="container-page py-3">
+          <div className="flex flex-wrap items-center gap-2">
             {/* Type tabs */}
-            <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1">
+            <div className="w-full sm:w-auto flex items-center gap-1 bg-background rounded-full p-1 max-w-full overflow-x-auto hide-scrollbar">
               {TYPES.map((t) => (
                 <button
                   key={t.key}
                   onClick={() => setType(t.key)}
-                  className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                    type === t.key
-                      ? "bg-primary text-white shadow-sm"
-                      : "text-text-secondary hover:text-text-main"
+                  className={`relative px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors duration-200 ${
+                    type === t.key ? "text-text-main" : "text-text-secondary hover:text-text-main"
                   }`}
                 >
-                  {t.label}
+                  {type === t.key && (
+                    <motion.span
+                      layoutId="projects-type"
+                      transition={{ type: "spring", stiffness: 400, damping: 34 }}
+                      className="absolute inset-0 rounded-full bg-white shadow-soft"
+                    />
+                  )}
+                  <span className="relative">{t.label}</span>
                 </button>
               ))}
             </div>
 
             {/* Status */}
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              className="border border-gray-200 rounded-xl px-3 py-2 text-sm text-text-main focus:outline-none focus:border-primary bg-white"
-            >
-              {STATUSES.map((s) => (
-                <option key={s.key} value={s.key}>{s.label}</option>
-              ))}
-            </select>
+            <div className="relative flex-1 sm:flex-none">
+              <select
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                aria-label="Status"
+                className="w-full appearance-none rounded-full border border-line bg-white pl-4 pr-9 py-2.5 text-sm font-medium text-text-main focus:outline-none focus:border-primary/60 cursor-pointer"
+              >
+                {STATUSES.map((s) => (
+                  <option key={s.key} value={s.key}>{s.label}</option>
+                ))}
+              </select>
+              <ChevronDown size={14} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-text-secondary" />
+            </div>
 
             {/* Sort */}
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value)}
-              className="border border-gray-200 rounded-xl px-3 py-2 text-sm text-text-main focus:outline-none focus:border-primary bg-white"
-            >
-              {SORTS.map((s) => (
-                <option key={s.key} value={s.key}>{s.label}</option>
-              ))}
-            </select>
+            <div className="relative flex-1 sm:flex-none">
+              <select
+                value={sort}
+                onChange={(e) => setSort(e.target.value)}
+                aria-label="Sort"
+                className="w-full appearance-none rounded-full border border-line bg-white pl-4 pr-9 py-2.5 text-sm font-medium text-text-main focus:outline-none focus:border-primary/60 cursor-pointer"
+              >
+                {SORTS.map((s) => (
+                  <option key={s.key} value={s.key}>{s.label}</option>
+                ))}
+              </select>
+              <ChevronDown size={14} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-text-secondary" />
+            </div>
 
             {/* Location search */}
-            <input
-              type="text"
-              placeholder="Search location…"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="border border-gray-200 rounded-xl px-3 py-2 text-sm text-text-main focus:outline-none focus:border-primary min-w-0 w-40"
-            />
+            <div className="relative w-full sm:w-auto sm:flex-1 sm:min-w-[180px] sm:max-w-xs order-first sm:order-none">
+              <Search size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-secondary" />
+              <input
+                type="text"
+                placeholder="Search location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                className="w-full rounded-full border border-line bg-white pl-10 pr-4 py-2.5 text-sm text-text-main placeholder:text-text-secondary/70 focus:outline-none focus:border-primary/60"
+              />
+            </div>
 
-            {/* Clear */}
             {hasFilters && (
               <button
                 onClick={clearFilters}
-                className="flex items-center gap-1.5 text-sm text-text-secondary hover:text-red-500 transition-colors"
+                className="flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-text-secondary hover:text-text-main hover:bg-background transition-colors"
               >
                 <X size={14} />
                 Clear
               </button>
             )}
 
-            <div className="ml-auto text-sm text-text-secondary">
+            <div className="w-full sm:w-auto sm:ml-auto text-sm text-text-secondary tabular-nums pt-1 sm:pt-0">
               {filtered.length} propert{filtered.length !== 1 ? "ies" : "y"}
             </div>
           </div>
         </div>
+        <div className="h-px bg-line" />
       </section>
 
       {/* Results */}
-      <section className="py-16 bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-12 sm:py-16 bg-white">
+        <div className="container-page">
           {filtered.length === 0 ? (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-center py-24 bg-white rounded-2xl border border-gray-100"
+              className="text-center py-24 px-6 bg-background rounded-4xl"
             >
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-5">
-                <Home size={28} className="text-primary" />
+              <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Home size={22} className="text-primary" />
               </div>
-              <h3 className="font-playfair text-2xl font-bold text-text-main mb-3">
-                No Properties Found
+              <h3 className="text-2xl font-semibold tracking-tight text-text-main mb-2">
+                No properties found
               </h3>
               <p className="text-text-secondary text-sm max-w-md mx-auto mb-8">
                 Try adjusting your filters or{" "}
-                <button onClick={clearFilters} className="text-primary underline">clear them</button>
+                <button onClick={clearFilters} className="text-text-main font-medium underline underline-offset-4">clear them</button>
                 {" "}to see all listings.
               </p>
-              <Link
-                href="/contact"
-                className="inline-flex items-center gap-2 bg-primary text-white font-semibold px-6 py-3 rounded-xl hover:bg-primary/90 transition-colors"
-              >
-                <MessageCircle size={16} />
-                Contact Us
+              <Link href="/contact" className="btn btn-primary">
+                Contact us
               </Link>
             </motion.div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-10">
               {filtered.map((property, index) => (
-                <PropertyCard key={property.id} property={property} index={index} />
+                <motion.div key={property.id} layout transition={{ duration: 0.35 }}>
+                  <PropertyCard property={property} index={index} />
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           )}
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="bg-primary py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white mb-4">
-            Don&apos;t See What You&apos;re Looking For?
-          </h2>
-          <p className="text-white/70 mb-6">
-            Tell us what you need and our team will find the right property for you.
-          </p>
-          <Link
-            href="/contact"
-            className="bg-accent text-white font-semibold px-8 py-3 rounded-xl hover:bg-accent/90 transition-colors inline-block"
-          >
-            Contact Our Team
-          </Link>
-        </div>
-      </section>
+      <CTABanner
+        title="Don't see what you're looking for?"
+        description="Tell us what you need and our team will find the right property for you."
+        primary={{ href: "/contact", label: "Contact our team" }}
+        secondary={null}
+      />
     </>
   );
 }

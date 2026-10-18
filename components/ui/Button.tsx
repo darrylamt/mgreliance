@@ -21,13 +21,13 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const base =
-      "inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed";
+      "inline-flex items-center justify-center gap-2 font-semibold rounded-full transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed";
 
     const variants = {
       primary:
         "bg-primary text-white hover:bg-primary/90 focus-visible:ring-primary",
       secondary:
-        "bg-white text-primary border border-primary hover:bg-primary/5 focus-visible:ring-primary",
+        "bg-white text-text-main border border-line hover:border-text-main/40 focus-visible:ring-primary",
       accent:
         "bg-accent text-white hover:bg-accent/90 focus-visible:ring-accent",
       outline:
@@ -39,7 +39,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const sizes = {
       sm: "text-sm px-4 py-2",
       md: "text-sm px-6 py-3",
-      lg: "text-base px-8 py-4",
+      lg: "text-[15px] px-7 py-3.5",
     };
 
     return (

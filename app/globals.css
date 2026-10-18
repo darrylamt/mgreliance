@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --font-playfair: "Playfair Display", Georgia, serif;
-}
-
 html,
 body {
   overflow-x: hidden;
@@ -13,65 +9,128 @@ body {
 }
 
 body {
-  font-family: var(--font-poppins), "Poppins", system-ui, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
   background-color: #ffffff;
-  color: #1a1a1a;
+  color: #141414;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-.font-playfair {
-  font-family: var(--font-playfair);
+::selection {
+  background: rgba(26, 60, 52, 0.12);
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1a3c34;
-  border-radius: 3px;
+  background: #d9d6cf;
+  border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #c9a84c;
+  background: #1a3c34;
 }
 
 /* Focus ring */
 *:focus-visible {
-  outline: 2px solid #c9a84c;
+  outline: 2px solid #1a3c34;
   outline-offset: 2px;
 }
 
 /* Hide scrollbar utility */
+.hide-scrollbar {
+  scrollbar-width: none;
+}
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
 
+@layer components {
+  .container-page {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-text-secondary;
+  }
+  .eyebrow::before {
+    content: "";
+    @apply h-1.5 w-1.5 rounded-full bg-accent;
+  }
+
+  .heading-xl {
+    @apply text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight leading-[1.05] text-text-main;
+  }
+  .heading-lg {
+    @apply text-3xl sm:text-4xl font-semibold tracking-tight leading-[1.1] text-text-main;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-primary/90;
+  }
+  .btn-secondary {
+    @apply bg-white text-text-main border border-line hover:border-text-main/40;
+  }
+  .btn-light {
+    @apply bg-white text-primary hover:bg-white/90;
+  }
+  .btn-outline-light {
+    @apply border border-white/25 text-white hover:bg-white/10;
+  }
+  .btn-lg {
+    @apply px-7 py-3.5 text-[15px];
+  }
+
+  .link-arrow {
+    @apply inline-flex items-center gap-1.5 text-sm font-semibold text-text-main transition-colors hover:text-primary;
+  }
+
+  .input {
+    @apply w-full rounded-2xl border border-line bg-white px-4 py-3 text-sm text-text-main placeholder:text-text-secondary/60 transition focus:outline-none focus:border-primary/60 focus:ring-4 focus:ring-primary/10;
+  }
+  .label {
+    @apply mb-2 block text-sm font-medium text-text-main;
+  }
+
+  .chip {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold;
+  }
+}
+
 /* Prose styles for blog content */
+.prose-content {
+  font-size: 1.0625rem;
+}
+
 .prose-content h2 {
-  font-family: var(--font-playfair);
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin-top: 2rem;
+  font-size: 1.625rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #141414;
+  margin-top: 2.5rem;
   margin-bottom: 1rem;
 }
 
 .prose-content h3 {
-  font-family: var(--font-playfair);
-  font-size: 1.375rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  color: #1a1a1a;
-  margin-top: 1.5rem;
+  letter-spacing: -0.01em;
+  color: #141414;
+  margin-top: 2rem;
   margin-bottom: 0.75rem;
 }
 
 .prose-content p {
-  color: #4b5563;
-  line-height: 1.8;
+  color: #4a4a46;
+  line-height: 1.85;
   margin-bottom: 1.25rem;
 }
 
@@ -79,28 +138,34 @@ body {
   list-style-type: disc;
   padding-left: 1.5rem;
   margin-bottom: 1.25rem;
-  color: #4b5563;
+  color: #4a4a46;
 }
 
 .prose-content ul li {
   margin-bottom: 0.5rem;
-  line-height: 1.7;
+  line-height: 1.75;
 }
 
 .prose-content a {
   color: #1a3c34;
   font-weight: 500;
   text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .prose-content a:hover {
-  color: #c9a84c;
+  color: #8a6d24;
+}
+
+.prose-content img {
+  border-radius: 1.25rem;
+  margin: 2rem 0;
 }
 
 .prose-content blockquote {
-  border-left: 3px solid #c9a84c;
-  padding-left: 1rem;
-  font-style: italic;
-  color: #6b7280;
-  margin: 1.5rem 0;
+  border-left: 2px solid #c9a84c;
+  padding-left: 1.25rem;
+  color: #6b6b66;
+  margin: 2rem 0;
+  font-size: 1.125rem;
 }

@@ -3,12 +3,13 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Bed, Bath, Maximize2 } from "lucide-react";
+import { MapPin, ArrowUpRight } from "lucide-react";
 import type { Property } from "@/lib/types";
 
 interface PropertyCardProps {
   property: Property;
   index?: number;
+  sizes?: string;
 }
 
 const typeLabels: Record<string, string> = {
@@ -23,104 +24,94 @@ const statusLabels: Record<string, string> = {
   sold: "Sold",
 };
 
-const statusColors: Record<string, string> = {
-  available: "bg-accent text-white",
-  rented: "bg-primary text-white",
-  sold: "bg-gray-500 text-white",
-};
-
 const placeholderImages = [
-  "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&q=80",
-  "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=80",
-  "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=80",
-  "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&q=80",
-  "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600&q=80",
-  "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=600&q=80",
+  "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80",
+  "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80",
+  "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80",
+  "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80",
+  "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&q=80",
+  "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=800&q=80",
 ];
 
-export default function PropertyCard({ property, index = 0 }: PropertyCardProps) {
+export default function PropertyCard({
+  property,
+  index = 0,
+  sizes = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
+}: PropertyCardProps) {
   const imageSrc =
     property.images?.[0] || placeholderImages[index % placeholderImages.length];
+
+  const specs = [
+    property.bedrooms != null && `${property.bedrooms} bed${property.bedrooms !== 1 ? "s" : ""}`,
+    property.bathrooms != null && `${property.bathrooms} bath${property.bathrooms !== 1 ? "s" : ""}`,
+    property.area != null && `${property.area} m²`,
+  ].filter(Boolean) as string[];
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.45, delay: (index % 3) * 0.1 }}
-      className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.6, delay: (index % 3) * 0.08, ease: [0.22, 1, 0.36, 1] }}
+      className="h-full"
     >
-      {/* Image */}
-      <div className="relative h-56 overflow-hidden">
-        <Image
-          src={imageSrc}
-          alt={property.title}
-          fill
-          className="object-cover group-hover:scale-105 transition-transform duration-500"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        />
-        {/* Status pill */}
-        <div className="absolute top-4 left-4">
-          <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${statusColors[property.status]}`}>
-            {statusLabels[property.status]}
-          </span>
-        </div>
-        {/* Type pill */}
-        <div className="absolute top-4 right-4">
-          <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-white/90 text-primary backdrop-blur-sm">
-            {typeLabels[property.type]}
-          </span>
-        </div>
-        {/* Price overlay at bottom */}
-        {property.price && (
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-4 pt-8 pb-3">
-            <p className="text-white font-bold text-lg">{property.price}</p>
+      <Link href={`/projects/${property.id}`} className="group block h-full">
+        {/* Image */}
+        <div className="relative aspect-[4/3] rounded-3xl overflow-hidden bg-background">
+          <Image
+            src={imageSrc}
+            alt={property.title}
+            fill
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+            sizes={sizes}
+          />
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500" />
+
+          <div className="absolute top-4 left-4 flex gap-2">
+            <span
+              className={`chip backdrop-blur-md ${
+                property.status === "sold" ? "bg-black/60 text-white" : "bg-white/90 text-text-main"
+              }`}
+            >
+              {statusLabels[property.status]}
+            </span>
           </div>
-        )}
-      </div>
 
-      {/* Content */}
-      <div className="p-5">
-        <h3 className="font-playfair text-lg font-semibold text-text-main mb-2 line-clamp-1 group-hover:text-primary transition-colors">
-          {property.title}
-        </h3>
-
-        <div className="flex items-center gap-1.5 text-text-secondary text-sm mb-4">
-          <MapPin size={13} className="shrink-0 text-accent" />
-          <span className="line-clamp-1">{property.location}</span>
+          {/* Hover arrow */}
+          <div className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white flex items-center justify-center text-text-main opacity-0 -translate-y-1 scale-90 group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100 transition-all duration-300">
+            <ArrowUpRight size={17} />
+          </div>
         </div>
 
-        {/* Specs row */}
-        {(property.bedrooms || property.bathrooms || property.area) && (
-          <div className="flex items-center gap-4 py-3 border-t border-b border-gray-100 mb-4">
-            {property.bedrooms != null && (
-              <div className="flex items-center gap-1.5 text-text-secondary text-sm">
-                <Bed size={15} className="text-primary/60" />
-                <span>{property.bedrooms} Bed{property.bedrooms !== 1 ? "s" : ""}</span>
-              </div>
-            )}
-            {property.bathrooms != null && (
-              <div className="flex items-center gap-1.5 text-text-secondary text-sm">
-                <Bath size={15} className="text-primary/60" />
-                <span>{property.bathrooms} Bath{property.bathrooms !== 1 ? "s" : ""}</span>
-              </div>
-            )}
-            {property.area != null && (
-              <div className="flex items-center gap-1.5 text-text-secondary text-sm">
-                <Maximize2 size={13} className="text-primary/60" />
-                <span>{property.area} m²</span>
-              </div>
+        {/* Content */}
+        <div className="pt-4 px-1">
+          <div className="flex items-start justify-between gap-4">
+            <h3 className="min-w-0 text-[17px] font-semibold text-text-main tracking-tight line-clamp-1 group-hover:text-primary transition-colors">
+              {property.title}
+            </h3>
+            {property.price && (
+              <p className="shrink-0 text-[17px] font-semibold text-text-main whitespace-nowrap">
+                {property.price}
+              </p>
             )}
           </div>
-        )}
 
-        <Link
-          href={`/projects/${property.id}`}
-          className="block w-full text-center text-sm font-semibold bg-primary/5 text-primary border border-primary/20 px-4 py-2.5 rounded-xl hover:bg-primary hover:text-white transition-all duration-200"
-        >
-          View Details
-        </Link>
-      </div>
+          <div className="mt-1.5 flex items-center gap-1.5 text-text-secondary text-sm">
+            <MapPin size={13} className="shrink-0" />
+            <span className="line-clamp-1">{property.location}</span>
+          </div>
+
+          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-text-secondary">
+            <span className="text-text-main font-medium">{typeLabels[property.type]}</span>
+            {specs.map((s) => (
+              <span key={s} className="flex items-center gap-3">
+                <span className="w-1 h-1 rounded-full bg-line" />
+                {s}
+              </span>
+            ))}
+          </div>
+        </div>
+      </Link>
     </motion.div>
   );
 }

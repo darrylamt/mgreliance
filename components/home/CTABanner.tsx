@@ -1,54 +1,47 @@
-"use client";
-
-import { motion } from "framer-motion";
 import Link from "next/link";
-import Image from "next/image";
+import { ArrowUpRight } from "lucide-react";
+import Reveal from "@/components/ui/Reveal";
 
-export default function CTABanner() {
+interface CTABannerProps {
+  title?: string;
+  description?: string;
+  primary?: { href: string; label: string };
+  secondary?: { href: string; label: string } | null;
+}
+
+export default function CTABanner({
+  title = "Let's find your perfect property.",
+  description = "Whether you are buying, selling, or investing — our team is ready to guide you every step of the way.",
+  primary = { href: "/contact", label: "Get in touch" },
+  secondary = { href: "/projects", label: "Browse properties" },
+}: CTABannerProps) {
   return (
-    <section className="relative py-24 overflow-hidden">
-      <Image
-        src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&q=80"
-        alt="Property background"
-        fill
-        className="object-cover"
-        sizes="100vw"
-      />
-      <div className="absolute inset-0 bg-primary/90" />
-
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-        >
-          <p className="text-accent text-sm font-semibold uppercase tracking-widest mb-4">
-            Ready to Begin?
-          </p>
-          <h2 className="font-playfair text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6">
-            Let&apos;s Find Your Perfect{" "}
-            <span className="text-accent">Property</span>
-          </h2>
-          <p className="text-white/70 text-lg max-w-2xl mx-auto mb-10">
-            Whether you are buying, selling, or investing — our team of expert agents
-            is ready to guide you every step of the way.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/contact"
-              className="bg-accent text-white font-semibold px-8 py-4 rounded-xl hover:bg-accent/90 transition-all duration-200 text-base shadow-lg"
-            >
-              Get in Touch
-            </Link>
-            <Link
-              href="/projects"
-              className="bg-white/10 text-white border border-white/30 font-semibold px-8 py-4 rounded-xl hover:bg-white/20 transition-all duration-200 text-base"
-            >
-              Browse Properties
-            </Link>
+    <section className="py-16 sm:py-24 bg-white">
+      <div className="container-page">
+        <Reveal className="relative overflow-hidden rounded-4xl bg-primary px-6 py-16 sm:px-16 sm:py-20">
+          {/* Soft glow */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-accent/20 blur-3xl"
+          />
+          <div className="relative max-w-2xl">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight leading-[1.1] text-white">
+              {title}
+            </h2>
+            <p className="mt-5 text-white/70 text-lg leading-relaxed">{description}</p>
+            <div className="mt-10 flex flex-col sm:flex-row gap-3">
+              <Link href={primary.href} className="btn btn-light btn-lg">
+                {primary.label}
+                <ArrowUpRight size={16} />
+              </Link>
+              {secondary && (
+                <Link href={secondary.href} className="btn btn-outline-light btn-lg">
+                  {secondary.label}
+                </Link>
+              )}
+            </div>
           </div>
-        </motion.div>
+        </Reveal>
       </div>
     </section>
   );
