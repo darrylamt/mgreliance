@@ -101,8 +101,8 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Mail size={16} className="text-accent shrink-0" />
-                <a href="mailto:info@mgrelianceproperty.com" className="text-white/70 text-sm hover:text-accent transition-colors">
-                  info@mgrelianceproperty.com
+                <a href="mailto:info@mgrelianceproperties.com" className="text-white/70 text-sm hover:text-accent transition-colors">
+                  info@mgrelianceproperties.com
                 </a>
               </li>
             </ul>
@@ -116,7 +116,7 @@ export default function Footer() {
           <p className="text-white/50 text-sm">
             © 2025 MG Reliance Property Developers. All rights reserved.
           </p>
-          <p className="text-white/30 text-xs">mgrelianceproperty.com</p>
+          <p className="text-white/30 text-xs">mgrelianceproperties.com</p>
         </div>
       </div>
     </footer>

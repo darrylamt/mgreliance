@@ -19,7 +19,7 @@ const poppins = Poppins({
 });
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://mgrelianceproperty.com";
+  process.env.NEXT_PUBLIC_SITE_URL || "https://mgrelianceproperties.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
@@ -123,7 +123,7 @@ const organizationSchema = {
     longitude: -0.158,
   },
   telephone: "+233244274630",
-  email: "info@mgrelianceproperty.com",
+  email: "info@mgrelianceproperties.com",
   areaServed: {
     "@type": "City",
     name: "Accra",

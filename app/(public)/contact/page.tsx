@@ -3,12 +3,12 @@ import ContactContent from "./ContactContent";
 import JsonLd from "@/components/seo/JsonLd";
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://mgrelianceproperty.com";
+  process.env.NEXT_PUBLIC_SITE_URL || "https://mgrelianceproperties.com";
 
 export const metadata: Metadata = {
   title: "Contact Us — Get in Touch",
   description:
-    "Contact MG Reliance Property Developers in Accra, Ghana. Call +233 244 27 4630, email info@mgrelianceproperty.com, or visit us in East Legon. We respond within one business day.",
+    "Contact MG Reliance Property Developers in Accra, Ghana. Call +233 244 27 4630, email info@mgrelianceproperties.com, or visit us in East Legon. We respond within one business day.",
   openGraph: {
     title: "Contact MG Reliance Property Developers",
     description:
@@ -31,7 +31,7 @@ const contactPageSchema = {
     "@id": `${BASE_URL}/#organization`,
     name: "MG Reliance Property Developers",
     telephone: "+233244274630",
-    email: "info@mgrelianceproperty.com",
+    email: "info@mgrelianceproperties.com",
     address: {
       "@type": "PostalAddress",
       streetAddress: "East Legon",

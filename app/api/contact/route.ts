@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
       const resend = new Resend(process.env.RESEND_API_KEY);
       await resend.emails.send({
         from: "MG Reliance Website <onboarding@resend.dev>",
-        to: ["info@mgrelianceproperty.com"],
+        to: ["info@mgrelianceproperties.com"],
         replyTo: sanitized.email,
         subject: `New Enquiry: ${sanitized.subject || "Contact Form Submission"}`,
         html: `

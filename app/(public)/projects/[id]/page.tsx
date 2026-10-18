@@ -6,7 +6,7 @@ import PropertyDetailClient from "./PropertyDetailClient";
 import JsonLd from "@/components/seo/JsonLd";
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://mgrelianceproperty.com";
+  process.env.NEXT_PUBLIC_SITE_URL || "https://mgrelianceproperties.com";
 
 interface Props {
   params: { id: string };

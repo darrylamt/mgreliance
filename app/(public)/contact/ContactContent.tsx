@@ -282,10 +282,10 @@ export default function ContactContent() {
                     <div>
                       <p className="text-white/50 text-xs mb-0.5">Email</p>
                       <a
-                        href="mailto:info@mgrelianceproperty.com"
+                        href="mailto:info@mgrelianceproperties.com"
                         className="text-sm hover:text-accent transition-colors break-all"
                       >
-                        info@mgrelianceproperty.com
+                        info@mgrelianceproperties.com
                       </a>
                     </div>
                   </div>
