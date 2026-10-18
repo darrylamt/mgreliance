@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ogImages, pageOg } from "@/lib/og/meta";
 import { createClient } from "@/lib/supabase/server";
 import type { Property } from "@/lib/types";
 import ProjectsClient from "./ProjectsClient";
@@ -31,6 +32,7 @@ export function generateMetadata({ searchParams }: Props): Metadata {
       description:
         "Browse MG Reliance's property listings across Greater Accra — residential homes, commercial spaces, and land for sale or rent. Filter by location, type, and price.",
       openGraph: {
+        images: pageOg("projects"),
         title: "Properties for Sale & Rent in Accra | MG Reliance",
         description:
           "Explore residential, commercial, and land listings across East Legon, Cantonments, Airport Residential, Tema, and beyond.",
@@ -56,7 +58,12 @@ export function generateMetadata({ searchParams }: Props): Metadata {
   return {
     title,
     description,
-    openGraph: { title: `${title} | MG Reliance`, description, url },
+    openGraph: {
+      title: `${title} | MG Reliance`,
+      description,
+      url,
+      images: ogImages(`/og/page?${params.toString()}`, title),
+    },
     alternates: { canonical: url },
   };
 }

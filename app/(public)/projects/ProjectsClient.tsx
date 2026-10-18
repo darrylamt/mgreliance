@@ -8,6 +8,7 @@ import Link from "next/link";
 import PropertyCard from "@/components/properties/PropertyCard";
 import PageHeader from "@/components/ui/PageHeader";
 import CTABanner from "@/components/home/CTABanner";
+import AlertSignup from "@/components/properties/AlertSignup";
 import type { Property } from "@/lib/types";
 
 interface ProjectsClientProps {
@@ -239,6 +240,13 @@ export default function ProjectsClient({
       {/* Results */}
       <section className="py-12 sm:py-16 bg-white">
         <div className="container-page">
+          <AlertSignup
+            variant="inline"
+            type={type || undefined}
+            status={status || undefined}
+            location={location.trim() || undefined}
+            className="mb-10"
+          />
           {filtered.length === 0 ? (
             <motion.div
               initial={{ opacity: 0, y: 16 }}

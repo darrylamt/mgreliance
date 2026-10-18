@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Heart } from "lucide-react";
 import { useSavedProperties } from "@/lib/useSavedProperties";
 import { cn } from "@/lib/utils";
+import { track } from "@/lib/analytics";
 
 interface SaveButtonProps {
   propertyId: string;
@@ -20,6 +21,7 @@ export default function SaveButton({ propertyId, className, variant = "icon" }: 
     // Cards are wrapped in a link — don't navigate when saving.
     e.preventDefault();
     e.stopPropagation();
+    if (!saved) track("save_property", { property_id: propertyId });
     toggle(propertyId);
   };
 

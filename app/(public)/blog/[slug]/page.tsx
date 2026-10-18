@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ogImages } from "@/lib/og/meta";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,6 +10,7 @@ import Badge from "@/components/ui/Badge";
 import JsonLd from "@/components/seo/JsonLd";
 import Reveal from "@/components/ui/Reveal";
 import CTABanner from "@/components/home/CTABanner";
+import ShareButton from "@/components/ui/ShareButton";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://mgrelianceproperties.com";
@@ -47,15 +49,12 @@ export async function generateMetadata({
         publishedTime: post.published_at || undefined,
         authors: post.author ? [post.author] : undefined,
         tags: post.category ? [post.category] : undefined,
-        images: post.cover_image_url
-          ? [{ url: post.cover_image_url, width: 1200, height: 630, alt: post.title }]
-          : [],
+        images: ogImages(`/og/post/${params.slug}`, post.title),
       },
       twitter: {
         card: "summary_large_image",
         title: post.title,
         description,
-        images: post.cover_image_url ? [post.cover_image_url] : [],
       },
       alternates: { canonical: `/blog/${params.slug}` },
     };
@@ -146,18 +145,26 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               {post.title}
             </h1>
 
-            <div className="mt-8 flex items-center gap-3 text-sm">
-              <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center text-xs font-semibold shrink-0">
-                {(post.author || "MG Reliance").split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
+            <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3 text-sm">
+                <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center text-xs font-semibold shrink-0">
+                  {(post.author || "MG Reliance").split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
+                </div>
+                <div>
+                  <p className="font-medium text-text-main">{post.author || "MG Reliance"}</p>
+                  {post.published_at && (
+                    <time dateTime={post.published_at} className="text-text-secondary">
+                      {formatDate(post.published_at)}
+                    </time>
+                  )}
+                </div>
               </div>
-              <div>
-                <p className="font-medium text-text-main">{post.author || "MG Reliance"}</p>
-                {post.published_at && (
-                  <time dateTime={post.published_at} className="text-text-secondary">
-                    {formatDate(post.published_at)}
-                  </time>
-                )}
-              </div>
+              <ShareButton
+                url={`${BASE_URL}/blog/${post.slug}`}
+                title={post.title}
+                contentType="post"
+                className="py-2.5"
+              />
             </div>
           </Reveal>
         </div>

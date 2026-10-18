@@ -6,19 +6,9 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Search, MapPin, Building2 } from "lucide-react";
 import CountUp from "@/components/ui/CountUp";
+import { AREAS } from "@/lib/areas";
 
-const LOCATIONS = [
-  "East Legon",
-  "Cantonments",
-  "Airport Residential",
-  "Labone",
-  "Adjiringanor",
-  "Trasacco Valley",
-  "Tema",
-  "Spintex",
-  "Achimota",
-  "Accra Central",
-];
+const LOCATIONS = AREAS.map((a) => a.name);
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -36,7 +26,8 @@ export default function Hero() {
     offset: ["start start", "end start"],
   });
   const imageY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
+  // Content sits at the bottom of the hero, so keep it solid until it's nearly scrolled away.
+  const contentOpacity = useTransform(scrollYProgress, [0.45, 0.85], [1, 0]);
 
   const handleSearch = () => {
     const params = new URLSearchParams();

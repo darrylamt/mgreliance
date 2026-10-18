@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, Phone, Mail, Instagram, Facebook, Linkedin, Twitter, Check, AlertCircle, ArrowUpRight } from "lucide-react";
 import Button from "@/components/ui/Button";
+import { track } from "@/lib/analytics";
 import PageHeader from "@/components/ui/PageHeader";
 import Reveal from "@/components/ui/Reveal";
 
@@ -54,6 +55,7 @@ export default function ContactContent() {
         setError(data.error || "Something went wrong. Please try again.");
       } else {
         setSuccess(true);
+        track("contact_submit", { subject: form.subject || "none" });
         setForm(initialForm);
       }
     } catch {

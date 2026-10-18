@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageOg } from "@/lib/og/meta";
 import { BookOpen } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import type { Post } from "@/lib/types";
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
     description:
       "Market updates, expert advice, and property tips from Accra's trusted real estate team.",
     url: "/blog",
+    images: pageOg("blog"),
   },
   alternates: { canonical: "/blog" },
 };

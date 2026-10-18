@@ -2,10 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
 import { slotsForDate, upcomingViewingDays } from "@/lib/contact";
+import { isUuid, propertyUrl } from "@/lib/urls";
 import type { SubmissionKind } from "@/lib/types";
-
-const BASE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://mgrelianceproperties.com";
 
 // Server-side Supabase client using service role key (bypasses RLS for inserts)
 function getSupabase() {
@@ -17,13 +15,6 @@ function getSupabase() {
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-function isUuid(value: unknown): value is string {
-  return (
-    typeof value === "string" &&
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value)
-  );
 }
 
 function escapeHtml(value: string): string {
@@ -92,16 +83,19 @@ export async function POST(request: NextRequest) {
     const supabase = getSupabase();
 
     let propertyTitle: string | null = null;
+    let propertyLink: string | null = null;
     if (kind !== "contact") {
+      // select("*") so this keeps working whether or not the slug column exists yet.
       const { data: property } = await supabase
         .from("properties")
-        .select("title")
+        .select("*")
         .eq("id", property_id)
         .single();
       if (!property) {
         return bad("This property could not be found. Please refresh and try again.");
       }
       propertyTitle = property.title;
+      propertyLink = propertyUrl(property);
     }
 
     const defaultSubject =
@@ -175,7 +169,7 @@ export async function POST(request: NextRequest) {
                 ${row("Name", `<strong>${e.name}</strong>`)}
                 ${row("Email", `<a href="mailto:${e.email}" style="color: #1a3c34;">${e.email}</a>`)}
                 ${e.phone ? row("Phone", e.phone) : ""}
-                ${e.property ? row("Property", `<a href="${BASE_URL}/projects/${sanitized.property_id}" style="color: #1a3c34;">${e.property}</a>`) : ""}
+                ${e.property ? row("Property", `<a href="${propertyLink}" style="color: #1a3c34;">${e.property}</a>`) : ""}
                 ${kind === "viewing" ? row("Viewing", `<strong>${formatViewingDate(sanitized.viewing_date!)} at ${sanitized.viewing_time}</strong>`) : ""}
                 ${e.subject && kind === "contact" ? row("Subject", e.subject) : ""}
               </table>

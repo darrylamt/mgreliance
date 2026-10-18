@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageOg } from "@/lib/og/meta";
 import AboutContent from "./AboutContent";
 
 export const metadata: Metadata = {
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
     description:
       "Founded in 2010, MG Reliance is one of Greater Accra's most trusted real estate agencies. Discover our story, mission, and team.",
     url: "/about",
+    images: pageOg("about"),
   },
   alternates: { canonical: "/about" },
 };

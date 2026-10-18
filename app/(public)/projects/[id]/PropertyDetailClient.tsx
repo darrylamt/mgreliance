@@ -12,6 +12,9 @@ import type { Property } from "@/lib/types";
 import PropertyCard from "@/components/properties/PropertyCard";
 import PropertyContactCard from "@/components/properties/PropertyContactCard";
 import SaveButton from "@/components/properties/SaveButton";
+import ShareButton from "@/components/ui/ShareButton";
+import { propertyUrl } from "@/lib/urls";
+import { areaForLocation, areaPath } from "@/lib/areas";
 
 interface Props {
   property: Property;
@@ -43,6 +46,7 @@ export default function PropertyDetailClient({ property, related }: Props) {
       : placeholderImages;
 
   const [activeImg, setActiveImg] = useState(0);
+  const area = areaForLocation(property.location);
 
   const specs = [
     property.bedrooms != null && { icon: Bed, value: property.bedrooms, label: `Bedroom${property.bedrooms !== 1 ? "s" : ""}` },
@@ -164,9 +168,19 @@ export default function PropertyDetailClient({ property, related }: Props) {
                 <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-text-main leading-tight">
                   {property.title}
                 </h1>
-                <div className="mt-3 flex items-center gap-1.5 text-text-secondary">
-                  <MapPin size={15} className="shrink-0" />
-                  <span>{property.location}</span>
+                <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-text-secondary">
+                  <span className="flex items-center gap-1.5">
+                    <MapPin size={15} className="shrink-0" />
+                    {property.location}
+                  </span>
+                  {area && (
+                    <Link
+                      href={areaPath(area)}
+                      className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+                    >
+                      About {area.name} &rarr;
+                    </Link>
+                  )}
                 </div>
               </div>
               <div className="flex items-center gap-4 sm:flex-col sm:items-end sm:gap-3">
@@ -175,7 +189,18 @@ export default function PropertyDetailClient({ property, related }: Props) {
                     {property.price}
                   </p>
                 )}
-                <SaveButton propertyId={property.id} variant="full" className="py-2.5 ml-auto sm:ml-0" />
+                <div className="flex items-center gap-2 ml-auto sm:ml-0">
+                  <SaveButton propertyId={property.id} variant="full" className="py-2.5" />
+                  <ShareButton
+                    url={propertyUrl(property)}
+                    title={property.title}
+                    text={[property.price, property.location].filter(Boolean).join(" · ")}
+                    storyImageUrl={`/og/story/${property.slug || property.id}`}
+                    flyerUrl={`/flyer/${property.slug || property.id}`}
+                    contentType="property"
+                    className="py-2.5"
+                  />
+                </div>
               </div>
             </motion.div>
 

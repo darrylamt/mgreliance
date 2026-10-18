@@ -152,14 +152,22 @@ export default function PropertyForm({ initialData, id }: PropertyFormProps) {
       amenities:   form.amenities,
     };
 
-    const { error: dbError } = id
-      ? await supabase.from("properties").update(payload).eq("id", id)
-      : await supabase.from("properties").insert([payload]);
+    const { data: saved, error: dbError } = id
+      ? await supabase.from("properties").update(payload).eq("id", id).select("id").single()
+      : await supabase.from("properties").insert([payload]).select("id").single();
 
     if (dbError) {
       setError(dbError.message);
       setLoading(false);
     } else {
+      // New listing -> email anyone with a matching alert. Never block saving on this.
+      if (!id && saved?.id) {
+        await fetch("/api/alerts/notify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ property_id: saved.id }),
+        }).catch(() => {});
+      }
       router.push("/admin/dashboard/properties");
       router.refresh();
     }

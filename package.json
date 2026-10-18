@@ -14,12 +14,14 @@
     "framer-motion": "^11.11.1",
     "lucide-react": "^0.460.0",
     "next": "14.2.16",
+    "qrcode": "^1.5.4",
     "react": "^18",
     "react-dom": "^18",
     "resend": "^4.0.1"
   },
   "devDependencies": {
     "@types/node": "^20",
+    "@types/qrcode": "^1.5.5",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.0.1",

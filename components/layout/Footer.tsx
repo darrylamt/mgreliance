@@ -1,20 +1,15 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Instagram, Facebook, Linkedin, Twitter } from "lucide-react";
+import { AREAS, areaPath } from "@/lib/areas";
 
 const quickLinks = [
   { href: "/about", label: "About" },
   { href: "/services", label: "Services" },
   { href: "/projects", label: "Properties" },
+  { href: "/areas", label: "Neighbourhoods" },
   { href: "/blog", label: "Blog" },
   { href: "/contact", label: "Contact" },
-];
-
-const services = [
-  "Residential Sales",
-  "Commercial Leasing",
-  "Land Acquisition",
-  "Property Management",
 ];
 
 const socials = [
@@ -72,14 +67,14 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Services */}
+          {/* Popular areas */}
           <div className="lg:col-span-2">
-            <h3 className="text-sm font-semibold text-text-main mb-4">Services</h3>
+            <h3 className="text-sm font-semibold text-text-main mb-4">Popular areas</h3>
             <ul className="space-y-3">
-              {services.map((service) => (
-                <li key={service}>
-                  <Link href="/services" className="text-text-secondary text-sm hover:text-text-main transition-colors">
-                    {service}
+              {AREAS.slice(0, 5).map((area) => (
+                <li key={area.slug}>
+                  <Link href={areaPath(area)} className="text-text-secondary text-sm hover:text-text-main transition-colors">
+                    {area.name}
                   </Link>
                 </li>
               ))}

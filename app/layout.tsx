@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { pageOg } from "@/lib/og/meta";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import JsonLd from "@/components/seo/JsonLd";
+import GoogleAnalytics from "@/components/seo/GoogleAnalytics";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -49,23 +51,12 @@ export const metadata: Metadata = {
     title: "MG Reliance Property Developers | Real Estate in Accra, Ghana",
     description:
       "Find your perfect property in Accra with MG Reliance. Residential sales, commercial leasing, land acquisition, and property management across Greater Accra.",
-    images: [
-      {
-        url: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80",
-        width: 1200,
-        height: 630,
-        alt: "MG Reliance Property Developers — Luxury Real Estate in Accra, Ghana",
-      },
-    ],
+    images: pageOg("home", "MG Reliance Property Developers — Real Estate in Accra, Ghana"),
   },
+  // Only the card type here: X falls back to each page's og:title / og:image,
+  // so child pages don't inherit the homepage's title.
   twitter: {
     card: "summary_large_image",
-    title: "MG Reliance Property Developers | Real Estate in Accra, Ghana",
-    description:
-      "Find your perfect property in Accra with MG Reliance. Residential, commercial & land across Greater Accra.",
-    images: [
-      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80",
-    ],
   },
   robots: {
     index: true,
@@ -170,7 +161,10 @@ export default function RootLayout({
         <JsonLd data={organizationSchema} />
         <JsonLd data={websiteSchema} />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <GoogleAnalytics />
+      </body>
     </html>
   );
 }

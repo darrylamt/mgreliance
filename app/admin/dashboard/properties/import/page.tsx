@@ -172,13 +172,14 @@ export default function ImportPropertiesPage() {
     let success = 0;
     let failed = 0;
     const errors: string[] = [];
+    const createdIds: string[] = [];
 
     for (const row of validRows) {
       const images = row.images
         ? row.images.split("|").map((u) => u.trim()).filter(Boolean)
         : [];
 
-      const { error } = await supabase.from("properties").insert([{
+      const { data: created, error } = await supabase.from("properties").insert([{
         title: row.title.trim(),
         type: row.type,
         location: row.location.trim(),
@@ -187,14 +188,24 @@ export default function ImportPropertiesPage() {
         status: row.status || "available",
         images,
         featured: row.featured === "true",
-      }]);
+      }]).select("id").single();
 
       if (error) {
         failed++;
         errors.push(`"${row.title}": ${error.message}`);
       } else {
         success++;
+        if (created?.id) createdIds.push(created.id);
       }
+    }
+
+    // Email matching listing alerts in one go. Never block the import on this.
+    if (createdIds.length > 0) {
+      await fetch("/api/alerts/notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ property_ids: createdIds }),
+      }).catch(() => {});
     }
 
     setResult({ success, failed, errors });

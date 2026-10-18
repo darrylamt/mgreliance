@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
+import { propertyPath } from "@/lib/urls";
+import { AREAS, areaPath } from "@/lib/areas";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://mgrelianceproperties.com";
@@ -32,6 +34,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     },
     {
+      url: `${BASE_URL}/areas`,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    ...AREAS.map((area) => ({
+      url: `${BASE_URL}${areaPath(area)}`,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    })),
+    {
       url: `${BASE_URL}/contact`,
       changeFrequency: "yearly",
       priority: 0.6,
@@ -45,7 +57,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const supabase = await createClient();
 
     const [propertiesRes, postsRes] = await Promise.all([
-      supabase.from("properties").select("id, updated_at"),
+      supabase.from("properties").select("*"),
       supabase
         .from("posts")
         .select("slug, updated_at")
@@ -53,7 +65,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ]);
 
     propertyRoutes = (propertiesRes.data || []).map((p) => ({
-      url: `${BASE_URL}/projects/${p.id}`,
+      url: `${BASE_URL}${propertyPath(p)}`,
       lastModified: new Date(p.updated_at),
       changeFrequency: "weekly" as const,
       priority: 0.8,

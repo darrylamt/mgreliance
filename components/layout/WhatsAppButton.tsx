@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import WhatsAppIcon from "@/components/ui/WhatsAppIcon";
 import { whatsappLink } from "@/lib/contact";
+import { track } from "@/lib/analytics";
 
 const BUBBLE_KEY = "mgr:wa-bubble-seen";
 
@@ -58,6 +59,7 @@ export default function WhatsAppButton() {
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat with MG Reliance on WhatsApp"
+        onClick={() => track("whatsapp_click", { location: "floating" })}
         initial={{ opacity: 0, scale: 0.6, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 260, damping: 20, delay: 1.2 }}

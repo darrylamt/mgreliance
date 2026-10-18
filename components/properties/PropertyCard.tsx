@@ -6,6 +6,7 @@ import Link from "next/link";
 import { MapPin, ArrowUpRight } from "lucide-react";
 import type { Property } from "@/lib/types";
 import SaveButton from "@/components/properties/SaveButton";
+import { propertyPath } from "@/lib/urls";
 
 interface PropertyCardProps {
   property: Property;
@@ -56,7 +57,7 @@ export default function PropertyCard({
       transition={{ duration: 0.6, delay: (index % 3) * 0.08, ease: [0.22, 1, 0.36, 1] }}
       className="h-full"
     >
-      <Link href={`/projects/${property.id}`} className="group block h-full">
+      <Link href={propertyPath(property)} className="group block h-full">
         {/* Image */}
         <div className="relative aspect-[4/3] rounded-3xl overflow-hidden bg-background">
           <Image

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageOg } from "@/lib/og/meta";
 import ServicesContent from "./ServicesContent";
 
 export const metadata: Metadata = {
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
     description:
       "From residential sales to commercial leasing and land acquisition — comprehensive real estate services across Greater Accra.",
     url: "/services",
+    images: pageOg("services"),
   },
   alternates: { canonical: "/services" },
 };

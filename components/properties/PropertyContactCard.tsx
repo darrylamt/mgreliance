@@ -12,12 +12,12 @@ import {
   whatsappLink,
 } from "@/lib/contact";
 import type { Property } from "@/lib/types";
+import { propertyUrl } from "@/lib/urls";
+import { track } from "@/lib/analytics";
 
 type Mode = "enquiry" | "viewing";
 
 const ease = [0.22, 1, 0.36, 1] as const;
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://mgrelianceproperties.com";
 
 function dayParts(date: string) {
   const d = new Date(`${date}T12:00:00`);
@@ -87,6 +87,7 @@ export default function PropertyContactCard({ property }: { property: Property }
         setError(data.error || "Failed to send. Please try again.");
       } else {
         setSent(mode);
+        track(mode === "viewing" ? "viewing_request" : "enquiry_submit", { property_id: property.id });
       }
     } catch {
       setError("Network error. Please check your connection and try again.");
@@ -95,7 +96,7 @@ export default function PropertyContactCard({ property }: { property: Property }
     }
   };
 
-  const pageUrl = `${SITE_URL}/projects/${property.id}`;
+  const pageUrl = propertyUrl(property);
   const waMessage = `Hi MG Reliance, I'm interested in "${property.title}" (${property.location}). ${pageUrl}`;
 
   return (
@@ -330,6 +331,7 @@ export default function PropertyContactCard({ property }: { property: Property }
           href={whatsappLink(waMessage)}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => track("whatsapp_click", { location: "property", property_id: property.id })}
           className="btn bg-[#25D366] text-white hover:bg-[#1fbd59] px-4"
         >
           <WhatsAppIcon size={17} />

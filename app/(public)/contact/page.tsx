@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageOg } from "@/lib/og/meta";
 import ContactContent from "./ContactContent";
 import JsonLd from "@/components/seo/JsonLd";
 
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
     description:
       "Get in touch with our team in East Legon, Accra. We're ready to help with residential sales, commercial leasing, land acquisition, and property management.",
     url: "/contact",
+    images: pageOg("contact"),
   },
   alternates: { canonical: "/contact" },
 };

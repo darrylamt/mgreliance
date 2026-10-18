@@ -3,6 +3,8 @@ export type PropertyStatus = "available" | "sold" | "rented";
 
 export interface Property {
   id: string;
+  /** Readable URL key; null until migration 003 has run. */
+  slug?: string | null;
   title: string;
   type: PropertyType;
   location: string;
