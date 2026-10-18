@@ -83,65 +83,63 @@ export default async function FlyerPage({ params }: { params: { key: string } })
           </div>
         </header>
 
-        {/* Photos */}
-        <div className="grid grid-cols-3 gap-[3mm] h-[105mm]">
-          <div className={`${photos.length > 1 ? "col-span-2" : "col-span-3"} rounded-[6mm] overflow-hidden bg-background`}>
-            {photos[0] && <img src={photos[0]} alt="" className="w-full h-full object-cover" />}
+        {/* Photos — images are absolutely positioned so Safari can't let them overflow the fixed height */}
+        <div className="grid grid-cols-3 grid-rows-1 gap-[3mm] h-[105mm] shrink-0">
+          <div className={`${photos.length > 1 ? "col-span-2" : "col-span-3"} relative min-h-0 rounded-[6mm] overflow-hidden bg-background`}>
+            {photos[0] && <img src={photos[0]} alt="" className="absolute inset-0 w-full h-full object-cover" />}
           </div>
           {photos.length > 1 && (
-            <div className="grid grid-rows-2 gap-[3mm]">
+            <div className="grid grid-rows-[minmax(0,1fr)_minmax(0,1fr)] gap-[3mm] min-h-0">
               {photos.slice(1, 3).map((src) => (
-                <div key={src} className="rounded-[6mm] overflow-hidden bg-background">
-                  <img src={src} alt="" className="w-full h-full object-cover" />
+                <div key={src} className="relative min-h-0 rounded-[6mm] overflow-hidden bg-background">
+                  <img src={src} alt="" className="absolute inset-0 w-full h-full object-cover" />
                 </div>
               ))}
             </div>
           )}
         </div>
 
-        {/* Title + price */}
-        <div className="flex items-end justify-between gap-6">
-          <div className="min-w-0">
-            <h1 className="text-[26pt] leading-[1.08] font-semibold tracking-tight text-text-main">
-              {property.title}
-            </h1>
-            <p className="mt-1.5 text-[11pt] text-text-secondary">{property.location}</p>
-          </div>
-          <p className="shrink-0 text-[20pt] font-semibold tracking-tight text-primary">
-            {property.price || "Price on request"}
-          </p>
-        </div>
-
-        {/* Specs */}
-        {specs.length > 0 && (
-          <div className="grid grid-cols-4 gap-[3mm]">
-            {specs.map((s) => (
-              <div key={s.label} className="rounded-[4mm] bg-background px-[4mm] py-[3mm]">
-                <p className="text-[13pt] font-semibold text-text-main">{s.value}</p>
-                <p className="text-[8.5pt] text-text-secondary">{s.label}</p>
+        {/* Title, price + specs on the left; description + amenities on the right */}
+        <div className="flex-1 min-h-0 grid grid-cols-2 gap-[8mm]">
+          <div className="min-w-0 flex flex-col gap-[4mm]">
+            <div>
+              <h1 className="text-[24pt] leading-[1.08] font-semibold tracking-tight text-text-main">
+                {property.title}
+              </h1>
+              <p className="mt-1.5 text-[11pt] text-text-secondary">{property.location}</p>
+              <p className="mt-[3mm] text-[20pt] font-semibold tracking-tight text-primary">
+                {property.price || "Price on request"}
+              </p>
+            </div>
+            {specs.length > 0 && (
+              <div className="grid grid-cols-2 gap-[3mm]">
+                {specs.map((s) => (
+                  <div key={s.label} className="rounded-[4mm] bg-background px-[4mm] py-[3mm]">
+                    <p className="text-[13pt] font-semibold text-text-main">{s.value}</p>
+                    <p className="text-[8.5pt] text-text-secondary">{s.label}</p>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
-        )}
 
-        {/* Description + amenities */}
-        <div className="flex-1 min-h-0 grid grid-cols-5 gap-[6mm] text-[9.5pt] leading-relaxed">
-          <div className="col-span-3 text-text-secondary overflow-hidden">{description}</div>
-          {property.amenities?.length > 0 && (
-            <ul className="col-span-2 space-y-1.5 overflow-hidden">
-              {property.amenities.slice(0, 8).map((a) => (
-                <li key={a} className="flex items-center gap-2 text-text-main">
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
-                  {a}
-                </li>
-              ))}
-            </ul>
-          )}
+          <div className="min-w-0 min-h-0 overflow-hidden flex flex-col gap-[4mm] text-[9.5pt] leading-relaxed">
+            {description && <p className="text-text-secondary">{description}</p>}
+            {property.amenities?.length > 0 && (
+              <ul className="grid grid-cols-2 gap-x-[4mm] gap-y-1.5">
+                {property.amenities.slice(0, 8).map((a) => (
+                  <li key={a} className="flex items-center gap-2 text-text-main">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
+                    {a}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
 
-        {/* Footer */}
         {/* Light footer: dark text stays crisp even if the print dialog drops background colours */}
-        <footer className="rounded-[6mm] border-[0.5mm] border-primary/25 bg-background p-[6mm] flex items-center gap-[6mm]">
+        <footer className="shrink-0 rounded-[6mm] border-[0.5mm] border-primary/25 bg-background p-[6mm] flex items-center gap-[6mm]">
           <div
             className="w-[30mm] h-[30mm] shrink-0 rounded-[3mm] bg-white border-[0.3mm] border-line p-[2.5mm] [&>svg]:w-full [&>svg]:h-full"
             dangerouslySetInnerHTML={{ __html: qrSvg }}
